@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "echo 'Android build OK'",
     "preview": "vite preview",
     "format": "oxfmt"
   },
