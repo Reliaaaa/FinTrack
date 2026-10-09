@@ -433,35 +433,57 @@ fun FinTrackApp() {
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    // Type selector
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Button(
-                            onClick = { isExpense = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isExpense) PrimaryCobalt else DarkNavyMuted
-                            ),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Pengeluaran")
+                    // Type selector (Pengeluaran, Pemasukan, Transfer)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(DarkNavyBackground)
+                            .padding(2.dp)
+                    ) {
+                        listOf("Pengeluaran" to true, "Pemasukan" to false).forEach { (lbl, isExp) ->
+                            val isSel = isExpense == isExp
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(if (isSel) PrimaryCobalt else Color.Transparent)
+                                    .clickable { isExpense = isExp }
+                                    .padding(vertical = 6.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(lbl, color = if (isSel) Color.White else TextMuted, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(
-                            onClick = { isExpense = false },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (!isExpense) SecondaryMint else DarkNavyMuted
-                            ),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Pemasukan", color = if (!isExpense) DarkNavyBackground else TextForeground)
+                    }
+
+                    // Quick Chips (+50rb, +100rb, +500rb, Pas)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        listOf(50000L to "+50rb", 100000L to "+100rb", 500000L to "+500rb").forEach { (addVal, lbl) ->
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(DarkNavyBackground)
+                                    .clickable {
+                                        val current = amountText.toLongOrNull() ?: 0L
+                                        amountText = (current + addVal).toString()
+                                    }
+                                    .padding(vertical = 6.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(lbl, color = TextForeground, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
 
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Nama Transaksi", color = TextMuted) },
+                        label = { Text("Nama Transaksi / Merchant", color = TextMuted) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = DarkNavyBackground,
@@ -790,13 +812,14 @@ fun FinTrackApp() {
                     onClick = {
                         val target = targetAmountText.toLongOrNull() ?: 0L
                         if (goalTitle.isNotBlank() && target > 0L) {
+                            val targetYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1
                             FinTrackRepository.addGoal(
                                 SavingsGoal(
                                     id = System.currentTimeMillis().toString(),
                                     title = goalTitle,
                                     targetAmount = target,
                                     currentAmount = 0L,
-                                    deadline = "Desember 2025",
+                                    deadline = "Desember $targetYear",
                                     category = goalCategory
                                 )
                             )

@@ -1,6 +1,8 @@
 package com.example.fintrack.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,17 +20,30 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material.icons.filled.LaptopMac
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Savings
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,11 +54,16 @@ import androidx.compose.ui.unit.sp
 import com.example.fintrack.data.repository.FinTrackRepository
 import com.example.fintrack.ui.components.FinTrackCard
 import com.example.fintrack.ui.components.FinTrackProgressBar
+import com.example.fintrack.ui.theme.DarkNavyBackground
+import com.example.fintrack.ui.theme.DarkNavyBorder
+import com.example.fintrack.ui.theme.DarkNavyCard
 import com.example.fintrack.ui.theme.DarkNavyCardElevated
+import com.example.fintrack.ui.theme.DarkNavyMuted
 import com.example.fintrack.ui.theme.PrimaryCobalt
 import com.example.fintrack.ui.theme.SecondaryMint
 import com.example.fintrack.ui.theme.TextForeground
 import com.example.fintrack.ui.theme.TextMuted
+import com.example.fintrack.ui.theme.WarningAmber
 
 @Composable
 fun GoalsScreen(
@@ -73,17 +93,17 @@ fun GoalsScreen(
             ) {
                 Column {
                     Text(
-                        text = "Target Impian",
+                        text = "Target Barang Impian",
                         style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
                         color = TextForeground
                     )
                     Text(
-                        text = "Wujudkan rencana keuangan masa depan",
+                        text = "Rencanakan & capai barang yang ingin kamu beli",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextMuted
                     )
                 }
-
                 Button(
                     onClick = onOpenAddGoal,
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryCobalt),
@@ -91,117 +111,162 @@ fun GoalsScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Target Baru", fontSize = 12.sp)
+                    Text("Target Baru", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
 
         item {
-            // Summary Card
+            // Overall Savings Metric Card
             FinTrackCard(backgroundColor = DarkNavyCardElevated, cornerRadius = 20.dp) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    alignItems = Alignment.CenterVertically
+                ) {
+                    Text("TOTAL TARGET IMPIAN AKTIF", style = MaterialTheme.typography.labelSmall, color = TextMuted)
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(SecondaryMint.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(SecondaryMint.copy(alpha = 0.15f))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
                     ) {
-                        Icon(imageVector = Icons.Default.Savings, contentDescription = null, tint = SecondaryMint, modifier = Modifier.size(22.dp))
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text("TOTAL TABUNGAN TERKUMPUL", style = MaterialTheme.typography.labelSmall, color = TextMuted)
-                        Text(FinTrackRepository.formatRupiah(totalCollected), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = TextForeground)
+                        Text("${goals.size} Sasaran Aktif", color = SecondaryMint, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
-                Spacer(modifier = Modifier.height(14.dp))
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = FinTrackRepository.formatRupiah(totalCollected),
+                    style = MaterialTheme.typography.displayLarge,
+                    color = TextForeground,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 FinTrackProgressBar(percent = overallPercent, threshold = 80)
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "$overallPercent% tercapai", style = MaterialTheme.typography.labelSmall, color = SecondaryMint)
-                    Text(text = "Target: ${FinTrackRepository.formatRupiah(totalTarget)}", style = MaterialTheme.typography.labelSmall, color = TextMuted)
-                }
-            }
-        }
 
-        items(goals, key = { it.id }) { goal ->
-            val percent = if (goal.targetAmount > 0) ((goal.currentAmount * 100) / goal.targetAmount).toInt() else 0
-            val remaining = (goal.targetAmount - goal.currentAmount).coerceAtLeast(0L)
-
-            FinTrackCard {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(PrimaryCobalt.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(imageVector = Icons.Default.Star, contentDescription = null, tint = PrimaryCobalt, modifier = Modifier.size(20.dp))
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = goal.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = TextForeground
-                        )
-                        Text(
-                            text = "${goal.category} · Batas: ${goal.deadline}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = TextMuted
-                        )
-                    }
-                    Text(
-                        text = "$percent%",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (percent >= 100) SecondaryMint else PrimaryCobalt
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-                FinTrackProgressBar(percent = percent, threshold = 80)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = FinTrackRepository.formatRupiah(goal.currentAmount),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = TextForeground
-                    )
-                    Text(
-                        text = "Sisa: ${FinTrackRepository.formatRupiah(remaining)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextMuted
-                    )
+                    Text("$overallPercent% Terkumpul", color = SecondaryMint, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text("Total Target Penuh: ${FinTrackRepository.formatRupiah(totalTarget)}", color = TextMuted, fontSize = 11.sp)
+                }
+            }
+        }
+
+        // Detailed Goals list
+        items(goals, key = { it.id }) { goal ->
+            val pct = if (goal.targetAmount > 0) ((goal.currentAmount * 100) / goal.targetAmount).toInt() else 0
+            val remaining = (goal.targetAmount - goal.currentAmount).coerceAtLeast(0L)
+
+            FinTrackCard {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(PrimaryCobalt.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = when (goal.iconName) {
+                                "flight" -> Icons.Default.Flight
+                                "shield" -> Icons.Default.Stars
+                                else -> Icons.Default.LaptopMac
+                            },
+                            contentDescription = null,
+                            tint = PrimaryCobalt,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(PrimaryCobalt.copy(alpha = 0.15f))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(goal.category, color = PrimaryCobalt, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(goal.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextForeground)
+                        if (goal.reasonNote.isNotBlank()) {
+                            Text(goal.reasonNote, style = MaterialTheme.typography.labelSmall, color = TextMuted, maxLines = 2)
+                        }
+                    }
+                    Text("$pct%", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = SecondaryMint)
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Quick contribute action
-                Button(
-                    onClick = {
-                        FinTrackRepository.contributeGoal(goal.id, 500000L)
-                        onShowToast("Berhasil menabung +Rp 500.000 ke ${goal.title}!")
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryCobalt.copy(alpha = 0.2f)),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                FinTrackProgressBar(percent = pct, threshold = 80)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("+ Tambah Tabungan Rp 500.000", color = PrimaryCobalt, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Column {
+                        Text("Terkumpul", color = TextMuted, fontSize = 10.sp)
+                        Text(FinTrackRepository.formatRupiah(goal.currentAmount), color = TextForeground, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text("Sisa Target", color = TextMuted, fontSize = 10.sp)
+                        Text(FinTrackRepository.formatRupiah(remaining), color = WarningAmber, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Quick Increment Presets (+1 Jt, +5 Jt, +10 Jt)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            FinTrackRepository.contributeGoal(goal.id, 1000000L)
+                            onShowToast("+Rp 1.000.000 disetor ke ${goal.title}!")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkNavyMuted),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("+1 Jt", fontSize = 11.sp, color = TextForeground)
+                    }
+                    Button(
+                        onClick = {
+                            FinTrackRepository.contributeGoal(goal.id, 5000000L)
+                            onShowToast("+Rp 5.000.000 disetor ke ${goal.title}!")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkNavyMuted),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("+5 Jt", fontSize = 11.sp, color = TextForeground)
+                    }
+                    Button(
+                        onClick = {
+                            FinTrackRepository.contributeGoal(goal.id, 10000000L)
+                            onShowToast("+Rp 10.000.000 disetor ke ${goal.title}!")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryCobalt.copy(alpha = 0.2f)),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("+10 Jt", fontSize = 11.sp, color = PrimaryCobalt, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

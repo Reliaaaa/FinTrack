@@ -2,6 +2,7 @@ package com.example.fintrack.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,21 +15,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DocumentScanner
-import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,186 +53,373 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.fintrack.data.model.ReceiptItem
 import com.example.fintrack.data.model.Transaction
 import com.example.fintrack.data.repository.FinTrackRepository
 import com.example.fintrack.ui.components.FinTrackCard
+import com.example.fintrack.ui.theme.DangerRed
 import com.example.fintrack.ui.theme.DarkNavyBackground
 import com.example.fintrack.ui.theme.DarkNavyBorder
 import com.example.fintrack.ui.theme.DarkNavyCard
 import com.example.fintrack.ui.theme.DarkNavyCardElevated
+import com.example.fintrack.ui.theme.DarkNavyMuted
 import com.example.fintrack.ui.theme.PrimaryCobalt
 import com.example.fintrack.ui.theme.SecondaryMint
-import com.example.fintrack.ui.theme.SuccessGreen
 import com.example.fintrack.ui.theme.TextForeground
 import com.example.fintrack.ui.theme.TextMuted
+import com.example.fintrack.ui.theme.WarningAmber
 
 @Composable
 fun ReceiptScannerScreen(
     onShowToast: (String) -> Unit
 ) {
-    var scanned by remember { mutableStateOf(true) }
+    val receiptItems by FinTrackRepository.receiptItems.collectAsState()
+    val targetTotal = 680000L
 
-    val receiptItems = listOf(
-        "Iced Caramel Macchiato" to 65000L,
-        "Almond Croissant" to 38000L,
-        "Cheese Bagel with Cream" to 32000L
-    )
-    val subtotal = receiptItems.sumOf { it.second }
-    val tax = (subtotal * 0.11).toLong()
-    val total = subtotal + tax
+    var showManualAddCard by remember { mutableStateOf(false) }
+    var newItemName by remember { mutableStateOf("Telur Ayam Omega 3 (10 btr)") }
+    var newItemCategory by remember { mutableStateOf("Kebutuhan Pokok") }
+    var newItemPriceText by remember { mutableStateOf("35000") }
+    var newItemQty by remember { mutableIntStateOf(1) }
+
+    val currentItemsTotal = receiptItems.sumOf { it.unitPrice * it.quantity }
+    val diff = currentItemsTotal - targetTotal
+    val pph11Tax = (currentItemsTotal * 0.11).toLong()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item {
             // Header
-            Text(
-                text = "Struk & Koreksi OCR",
-                style = MaterialTheme.typography.headlineMedium,
-                color = TextForeground,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            Text(
-                text = "Pindai struk fisik & ekstrak rincian belanja otomatis",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextMuted
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                alignItems = Alignment.CenterVertically
+            ) {
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(SecondaryMint.copy(alpha = 0.15f))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text("MODE KOREKSI OCR", color = SecondaryMint, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Koreksi Item Struk OCR",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = TextForeground
+                    )
+                    Text(
+                        text = "#TX-8921 • Grand Lucky SCBD • ${FinTrackRepository.getDateOffsetFormatted(0)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextMuted
+                    )
+                }
+            }
         }
 
         item {
-            // Scanner Action Banner
+            // Target OCR vs Hasil Koreksi Metric Card
             FinTrackCard(backgroundColor = DarkNavyCardElevated) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Column {
+                        Text("TARGET NOTA OCR", style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                        Text(FinTrackRepository.formatRupiah(targetTotal), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = TextForeground)
+                        Text("Sesuai Nota Fisik", style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text("HASIL KOREKSI (${receiptItems.size} ITEM)", style = MaterialTheme.typography.labelSmall, color = PrimaryCobalt)
+                        Text(FinTrackRepository.formatRupiah(currentItemsTotal), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = if (diff == 0L) SecondaryMint else PrimaryCobalt)
+                        Text(
+                            if (diff == 0L) "Cocok 100%" else "+${FinTrackRepository.formatRupiah(diff)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (diff == 0L) SecondaryMint else WarningAmber
+                        )
+                    }
+                }
+
+                if (diff != 0L) {
+                    Spacer(modifier = Modifier.height(10.dp))
                     Box(
                         modifier = Modifier
-                            .size(46.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(PrimaryCobalt.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(WarningAmber.copy(alpha = 0.15f))
+                            .padding(8.dp)
                     ) {
-                        Icon(imageVector = Icons.Default.DocumentScanner, contentDescription = null, tint = PrimaryCobalt, modifier = Modifier.size(26.dp))
-                    }
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "OCR Receipt Studio",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = TextForeground
-                        )
-                        Text(
-                            text = "Koreksi item per baris sebelum disimpan ke jurnal",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = TextMuted
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.Warning, contentDescription = null, tint = WarningAmber, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Selisih: +${FinTrackRepository.formatRupiah(diff)}. Total melebihi hasil pindai OCR awal.",
+                                color = WarningAmber,
+                                fontSize = 11.sp
+                            )
+                        }
                     }
                 }
             }
         }
 
         item {
-            // Parsed Receipt Details Card
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                alignItems = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Rincian Item Terpindai (${receiptItems.size} Item)",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = TextForeground
+                )
+            }
+        }
+
+        // Receipt items list
+        items(receiptItems, key = { it.id }) { item ->
             FinTrackCard {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = item.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextForeground
+                        )
+                        Text(
+                            text = "${item.category} • @ ${FinTrackRepository.formatRupiah(item.unitPrice)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TextMuted
+                        )
+                    }
+                    IconButton(
+                        onClick = { FinTrackRepository.removeReceiptItem(item.id) },
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Hapus", tint = DangerRed, modifier = Modifier.size(16.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     alignItems = Alignment.CenterVertically
                 ) {
-                    Column {
-                        Text(
-                            text = "Starbucks Reserve Indonesia",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = TextForeground
-                        )
-                        Text(
-                            text = "Cabang Grand Indonesia · ${FinTrackRepository.getDateOffsetFormatted(0)}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = TextMuted
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(SuccessGreen.copy(alpha = 0.15f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text("OCR Akurat (99%)", color = SuccessGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Item rows
-                receiptItems.forEach { (item, price) ->
+                    // Stepper (- qty +)
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(DarkNavyBackground)
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = item, style = MaterialTheme.typography.bodyMedium, color = TextForeground)
-                        Text(text = FinTrackRepository.formatRupiah(price), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = TextForeground)
+                        IconButton(
+                            onClick = { FinTrackRepository.updateReceiptItemQty(item.id, -1) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.Remove, contentDescription = null, tint = TextForeground, modifier = Modifier.size(14.dp))
+                        }
+                        Text(
+                            text = "${item.quantity}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = TextForeground,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                        IconButton(
+                            onClick = { FinTrackRepository.updateReceiptItemQty(item.id, 1) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = TextForeground, modifier = Modifier.size(14.dp))
+                        }
+                    }
+
+                    Text(
+                        text = FinTrackRepository.formatRupiah(item.unitPrice * item.quantity),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = SecondaryMint
+                    )
+                }
+            }
+        }
+
+        item {
+            // Button to toggle manual addition card
+            Button(
+                onClick = { showManualAddCard = !showManualAddCard },
+                colors = ButtonDefaults.buttonColors(containerColor = DarkNavyMuted),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(imageVector = Icons.Default.AddCircle, contentDescription = null, tint = PrimaryCobalt, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Tambah Item Baru Manual", color = PrimaryCobalt, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        if (showManualAddCard) {
+            item {
+                FinTrackCard(backgroundColor = DarkNavyCardElevated) {
+                    Text("TAMBAH ITEM MANUAL", color = PrimaryCobalt, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = newItemName,
+                        onValueChange = { newItemName = it },
+                        label = { Text("Nama Item Belanja", color = TextMuted) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = DarkNavyBackground,
+                            unfocusedContainerColor = DarkNavyBackground,
+                            focusedTextColor = TextForeground,
+                            unfocusedTextColor = TextForeground,
+                            focusedBorderColor = PrimaryCobalt,
+                            unfocusedBorderColor = DarkNavyBorder
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = newItemPriceText,
+                        onValueChange = { newItemPriceText = it.filter { c -> c.isDigit() } },
+                        label = { Text("Harga Satuan (Rp)", color = TextMuted) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = DarkNavyBackground,
+                            unfocusedContainerColor = DarkNavyBackground,
+                            focusedTextColor = TextForeground,
+                            unfocusedTextColor = TextForeground,
+                            focusedBorderColor = PrimaryCobalt,
+                            unfocusedBorderColor = DarkNavyBorder
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Button(
+                        onClick = {
+                            val price = newItemPriceText.toLongOrNull() ?: 0L
+                            if (newItemName.isNotBlank() && price > 0L) {
+                                FinTrackRepository.addReceiptItem(
+                                    ReceiptItem(
+                                        id = System.currentTimeMillis().toString(),
+                                        name = newItemName,
+                                        category = newItemCategory,
+                                        unitPrice = price,
+                                        quantity = newItemQty
+                                    )
+                                )
+                                showManualAddCard = false
+                                onShowToast("Item '${newItemName}' dimasukkan ke struk!")
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryCobalt),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Masukkan ke Struk")
                     }
                 }
+            }
+        }
 
-                Spacer(modifier = Modifier.height(8.dp))
+        item {
+            // Calculation Summary Card
+            FinTrackCard {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Subtotal Item Terverifikasi", color = TextMuted, fontSize = 12.sp)
+                    Text(FinTrackRepository.formatRupiah(currentItemsTotal), color = TextForeground, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("PPN 11% (Termasuk di harga)", color = TextMuted, fontSize = 12.sp)
+                    Text(FinTrackRepository.formatRupiah(pph11Tax), color = TextMuted, fontSize = 12.sp)
+                }
+                Spacer(modifier = Modifier.height(6.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(1.dp)
                         .background(DarkNavyBorder)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-
+                Spacer(modifier = Modifier.height(6.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "PPN Restoran (11%)", style = MaterialTheme.typography.labelSmall, color = TextMuted)
-                    Text(text = FinTrackRepository.formatRupiah(tax), style = MaterialTheme.typography.labelSmall, color = TextMuted)
+                    Text("Total Transaksi Akhir", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextForeground)
+                    Text(FinTrackRepository.formatRupiah(currentItemsTotal), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = SecondaryMint)
                 }
+            }
+        }
 
-                Spacer(modifier = Modifier.height(4.dp))
+        item {
+            // Bottom Action CTAs
+            Button(
+                onClick = {
+                    val newTx = Transaction(
+                        id = System.currentTimeMillis(),
+                        name = "Grand Lucky SCBD (OCR)",
+                        category = "Makanan & Minuman",
+                        amount = -currentItemsTotal,
+                        date = FinTrackRepository.getTodayDate(),
+                        account = "BCA Utama (•••• 4821)",
+                        note = "${receiptItems.size} item struk tervalidasi OCR",
+                        receiptImageAttached = true,
+                        merchantLocation = "Grand Lucky SCBD"
+                    )
+                    FinTrackRepository.addTransaction(newTx)
+                    onShowToast("Koreksi berhasil disimpan & laporan diperbarui!")
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryCobalt),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(48.dp)
+            ) {
+                Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Simpan Koreksi & Update Laporan (${FinTrackRepository.formatRupiah(currentItemsTotal)})", fontWeight = FontWeight.Bold)
+            }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "Total Akhir", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextForeground)
-                    Text(text = FinTrackRepository.formatRupiah(total), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = SecondaryMint)
-                }
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(18.dp))
-
-                Button(
-                    onClick = {
-                        val newTx = Transaction(
-                            id = System.currentTimeMillis(),
-                            name = "Starbucks Grand Indonesia (OCR)",
-                            category = "Makanan & Minuman",
-                            amount = -total,
-                            date = FinTrackRepository.getTodayDate(),
-                            account = "BCA",
-                            note = "3 item diimpor via Receipt Studio"
-                        )
-                        FinTrackRepository.addTransaction(newTx)
-                        onShowToast("Struk berhasil dicatat ke transaksi FinTrack!")
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryCobalt),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Simpan ke Transaksi FinTrack", fontWeight = FontWeight.Bold)
-                }
+            Button(
+                onClick = {
+                    FinTrackRepository.resetReceiptItems()
+                    onShowToast("Item direset ke ekstraksi AI awal.")
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = DarkNavyMuted),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(imageVector = Icons.Default.History, contentDescription = null, tint = TextMuted, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Reset ke Hasil Ekstraksi AI Awal", color = TextForeground)
             }
         }
 
