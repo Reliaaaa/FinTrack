@@ -15,12 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -28,12 +25,8 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.PieChart
-import androidx.compose.material.icons.filled.ReceiptLong
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +47,7 @@ import com.example.fintrack.ui.components.CategoryIconBadge
 import com.example.fintrack.ui.components.FinTrackCard
 import com.example.fintrack.ui.components.FinTrackProgressBar
 import com.example.fintrack.ui.theme.DangerRed
+import com.example.fintrack.ui.theme.DarkNavyBackground
 import com.example.fintrack.ui.theme.DarkNavyBorder
 import com.example.fintrack.ui.theme.DarkNavyCard
 import com.example.fintrack.ui.theme.DarkNavyCardElevated
@@ -94,7 +88,7 @@ fun OverviewScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            // Header Greeting
+            // Header Greeting & Real-time Date
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,12 +98,19 @@ fun OverviewScreen(
             ) {
                 Column {
                     Text(
+                        text = FinTrackRepository.getFormattedToday(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = SecondaryMint,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
                         text = "Halo, ${userProfile.nickname} 👋",
                         style = MaterialTheme.typography.headlineMedium,
                         color = TextForeground
                     )
                     Text(
-                        text = "Kelola arus kas & aset cerdas",
+                        text = "Kelola arus kas & aset cerdas hari ini",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextMuted
                     )
@@ -287,7 +288,7 @@ fun OverviewScreen(
         }
 
         item {
-            // 7-day spending trends chart preview
+            // Dynamic 7-day spending trends chart
             FinTrackCard {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -295,13 +296,13 @@ fun OverviewScreen(
                     alignItems = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Tren Pengeluaran 7 Hari",
+                        text = "Tren Pengeluaran 7 Hari Terakhir",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = TextForeground
                     )
                     Text(
-                        text = "Harian",
+                        text = "Terkini",
                         style = MaterialTheme.typography.labelSmall,
                         color = PrimaryCobalt,
                         modifier = Modifier
@@ -313,9 +314,15 @@ fun OverviewScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Bar chart simulation
-                val days = listOf("Sen" to 450000L, "Sel" to 1200000L, "Rab" to 300000L, "Kam" to 850000L, "Jum" to 950000L, "Sab" to 1500000L, "Min" to 980000L)
-                val maxSpending = days.maxOf { it.second }.toFloat()
+                // Dynamic days ending today
+                val recentDays = FinTrackRepository.getRecentDays()
+                val daySpendings = recentDays.map { (dayLabel, dateStr) ->
+                    val spent = transactions
+                        .filter { it.amount < 0 && it.date == dateStr }
+                        .sumOf { -it.amount }
+                    Triple(dayLabel, dateStr, spent)
+                }
+                val maxSpending = daySpendings.maxOf { it.third }.coerceAtLeast(100000L).toFloat()
 
                 Row(
                     modifier = Modifier
@@ -324,8 +331,9 @@ fun OverviewScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     alignItems = Alignment.Bottom
                 ) {
-                    days.forEach { (day, amount) ->
-                        val heightFraction = (amount / maxSpending).coerceIn(0.1f, 1f)
+                    daySpendings.forEach { (dayLabel, dateStr, amount) ->
+                        val isToday = dateStr == FinTrackRepository.getTodayDate()
+                        val heightFraction = if (amount > 0) (amount / maxSpending).coerceIn(0.15f, 1f) else 0.08f
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.weight(1f)
@@ -336,14 +344,15 @@ fun OverviewScreen(
                                     .height((90 * heightFraction).dp)
                                     .clip(RoundedCornerShape(6.dp))
                                     .background(
-                                        if (day == "Sab") PrimaryCobalt else SecondaryMint
+                                        if (isToday) SecondaryMint else PrimaryCobalt
                                     )
                             )
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = day,
+                                text = dayLabel,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = TextMuted,
+                                color = if (isToday) SecondaryMint else TextMuted,
+                                fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 10.sp
                             )
                         }
@@ -485,41 +494,6 @@ fun OverviewScreen(
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
-        }
-    }
-}
-
-@Composable
-fun QuickActionItem(
-    title: String,
-    icon: ImageVector,
-    iconColor: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(DarkNavyCard)
-            .border(1.dp, DarkNavyBorder, RoundedCornerShape(14.dp))
-            .clickable { onClick() }
-            .padding(vertical = 12.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = iconColor,
-                modifier = Modifier.size(22.dp)
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelSmall,
-                color = TextForeground,
-                fontWeight = FontWeight.Medium
-            )
         }
     }
 }

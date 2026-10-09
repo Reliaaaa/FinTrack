@@ -117,7 +117,7 @@ fun InstantExpenseScreen(
                             name = preset.name,
                             category = preset.category,
                             amount = -preset.amount,
-                            date = "2024-10-24",
+                            date = FinTrackRepository.getTodayDate(),
                             account = preset.account,
                             note = "Dicatat via Transaksi Instan"
                         )

@@ -138,7 +138,7 @@ fun ReceiptScannerScreen(
                             color = TextForeground
                         )
                         Text(
-                            text = "Cabang Grand Indonesia · 24 Okt 2024",
+                            text = "Cabang Grand Indonesia · ${FinTrackRepository.getDateOffsetFormatted(0)}",
                             style = MaterialTheme.typography.labelSmall,
                             color = TextMuted
                         )
@@ -204,7 +204,7 @@ fun ReceiptScannerScreen(
                             name = "Starbucks Grand Indonesia (OCR)",
                             category = "Makanan & Minuman",
                             amount = -total,
-                            date = "2024-10-24",
+                            date = FinTrackRepository.getTodayDate(),
                             account = "BCA",
                             note = "3 item diimpor via Receipt Studio"
                         )

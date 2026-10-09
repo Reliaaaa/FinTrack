@@ -23,7 +23,7 @@ data class BudgetConfig(
     val limit: Long,
     val threshold: Int = 80, // percentage for warning
     val recurring: Boolean = true,
-    val month: String = "2024-10"
+    val month: String = ""
 )
 
 data class SavingsGoal(

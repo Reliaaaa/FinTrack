@@ -194,7 +194,9 @@ fun FinTrackApp() {
                             .background(DarkNavyCard)
                             .border(1.dp, DarkNavyBorder, RoundedCornerShape(8.dp))
                             .clickable {
-                                val nextPeriod = if (selectedPeriod == "2024-10") "2024-09" else "2024-10"
+                                val curr = FinTrackRepository.getCurrentMonth()
+                                val prev = FinTrackRepository.getPreviousMonth()
+                                val nextPeriod = if (selectedPeriod == curr) prev else curr
                                 FinTrackRepository.setPeriod(nextPeriod)
                                 showToast("Beralih ke periode $nextPeriod")
                             }
@@ -529,7 +531,7 @@ fun FinTrackApp() {
                                     name = name,
                                     category = category,
                                     amount = if (isExpense) -amount else amount,
-                                    date = "2024-10-24",
+                                    date = FinTrackRepository.getTodayDate(),
                                     account = account,
                                     note = note
                                 )
@@ -876,7 +878,7 @@ fun FinTrackApp() {
                                     name = subName,
                                     cost = cost,
                                     billingCycle = "Bulanan",
-                                    nextDueDate = "2024-11-15",
+                                    nextDueDate = FinTrackRepository.getFutureDate(30),
                                     active = true
                                 )
                             )

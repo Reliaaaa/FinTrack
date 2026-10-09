@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 object FinTrackRepository {
@@ -23,14 +26,71 @@ object FinTrackRepository {
         return if (withPrefix) "Rp $formatted" else formatted
     }
 
+    // Dynamic Date & Time Utilities
+    fun getTodayDate(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(Date())
+    }
+
+    fun getCurrentMonth(): String {
+        val sdf = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        return sdf.format(Date())
+    }
+
+    fun getPreviousMonth(): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.MONTH, -1)
+        val sdf = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        return sdf.format(cal.time)
+    }
+
+    fun getFormattedToday(): String {
+        val sdf = SimpleDateFormat("EEEE, d MMMM yyyy", localeID)
+        return sdf.format(Date())
+    }
+
+    fun getDateOffset(daysAgo: Int): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, -daysAgo)
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(cal.time)
+    }
+
+    fun getDateOffsetFormatted(daysAgo: Int): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, -daysAgo)
+        val sdf = SimpleDateFormat("d MMM yyyy", localeID)
+        return sdf.format(cal.time)
+    }
+
+    fun getFutureDate(daysAhead: Int): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, daysAhead)
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(cal.time)
+    }
+
+    fun getRecentDays(): List<Pair<String, String>> {
+        // Returns list of (DayLabel, YYYY-MM-DD) for last 7 days ending today
+        val daySdf = SimpleDateFormat("EEE", localeID)
+        val dateSdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return (6 downTo 0).map { daysAgo ->
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.DAY_OF_YEAR, -daysAgo)
+            Pair(daySdf.format(cal.time), dateSdf.format(cal.time))
+        }
+    }
+
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
 
-    private val _selectedPeriod = MutableStateFlow("2024-10")
+    private val _selectedPeriod = MutableStateFlow(getCurrentMonth())
     val selectedPeriod: StateFlow<String> = _selectedPeriod.asStateFlow()
 
     private val _hideBalance = MutableStateFlow(false)
     val hideBalance: StateFlow<Boolean> = _hideBalance.asStateFlow()
+
+    private val currentYear = Calendar.getInstance().get(Calendar.YEAR)
 
     private val _transactions = MutableStateFlow(
         listOf(
@@ -39,16 +99,16 @@ object FinTrackRepository {
                 name = "Gaji bulanan",
                 category = "Pemasukan",
                 amount = 15000000L,
-                date = "2024-10-24",
+                date = getTodayDate(),
                 account = "BCA",
-                note = "Gaji pokok bulan Oktober"
+                note = "Gaji pokok bulan berjalan"
             ),
             Transaction(
                 id = 2,
                 name = "Kopi sore di Starbucks",
                 category = "Makanan & Minuman",
                 amount = -65000L,
-                date = "2024-10-24",
+                date = getTodayDate(),
                 account = "GoPay",
                 note = "Caramel Macchiato"
             ),
@@ -57,7 +117,7 @@ object FinTrackRepository {
                 name = "Belanja kebutuhan bulanan",
                 category = "Belanja",
                 amount = -850000L,
-                date = "2024-10-23",
+                date = getDateOffset(1),
                 account = "BCA",
                 note = "Supermarket Grand Lucky"
             ),
@@ -66,7 +126,7 @@ object FinTrackRepository {
                 name = "Grab ke kantor",
                 category = "Transportasi",
                 amount = -45000L,
-                date = "2024-10-23",
+                date = getDateOffset(1),
                 account = "GoPay",
                 note = "GrabCar PP"
             ),
@@ -75,7 +135,7 @@ object FinTrackRepository {
                 name = "Makan siang sushi",
                 category = "Makanan & Minuman",
                 amount = -75000L,
-                date = "2024-10-22",
+                date = getDateOffset(2),
                 account = "BCA",
                 note = "Sushi Tei promo"
             ),
@@ -84,7 +144,7 @@ object FinTrackRepository {
                 name = "Dividen Saham BBCA",
                 category = "Investasi",
                 amount = 450000L,
-                date = "2024-10-20",
+                date = getDateOffset(4),
                 account = "Bibit",
                 note = "Dividen interim"
             ),
@@ -93,7 +153,7 @@ object FinTrackRepository {
                 name = "Tagihan Listrik & WiFi",
                 category = "Tagihan & Utilitas",
                 amount = -620000L,
-                date = "2024-10-18",
+                date = getDateOffset(6),
                 account = "BCA",
                 note = "PLN & Indihome"
             )
@@ -113,31 +173,31 @@ object FinTrackRepository {
 
     private val _budgets = MutableStateFlow(
         listOf(
-            BudgetConfig(name = "Makanan & Minuman", limit = 2500000L, threshold = 80, recurring = true, month = "2024-10"),
-            BudgetConfig(name = "Belanja", limit = 2500000L, threshold = 80, recurring = true, month = "2024-10"),
-            BudgetConfig(name = "Transportasi", limit = 1000000L, threshold = 80, recurring = true, month = "2024-10"),
-            BudgetConfig(name = "Tagihan & Utilitas", limit = 1500000L, threshold = 85, recurring = true, month = "2024-10")
+            BudgetConfig(name = "Makanan & Minuman", limit = 2500000L, threshold = 80, recurring = true, month = getCurrentMonth()),
+            BudgetConfig(name = "Belanja", limit = 2500000L, threshold = 80, recurring = true, month = getCurrentMonth()),
+            BudgetConfig(name = "Transportasi", limit = 1000000L, threshold = 80, recurring = true, month = getCurrentMonth()),
+            BudgetConfig(name = "Tagihan & Utilitas", limit = 1500000L, threshold = 85, recurring = true, month = getCurrentMonth())
         )
     )
     val budgets: StateFlow<List<BudgetConfig>> = _budgets.asStateFlow()
 
     private val _savingsGoals = MutableStateFlow(
         listOf(
-            SavingsGoal(id = "1", title = "Dana Darurat", targetAmount = 50000000L, currentAmount = 32500000L, deadline = "Desember 2025", category = "Keamanan Finansial"),
-            SavingsGoal(id = "2", title = "Liburan ke Jepang", targetAmount = 25000000L, currentAmount = 14200000L, deadline = "Maret 2025", category = "Liburan"),
-            SavingsGoal(id = "3", title = "DP Rumah Idaman", targetAmount = 150000000L, currentAmount = 45000000L, deadline = "Desember 2026", category = "Properti"),
-            SavingsGoal(id = "4", title = "Upgrade Laptop Kerja", targetAmount = 22000000L, currentAmount = 18500000L, deadline = "November 2024", category = "Elektronik")
+            SavingsGoal(id = "1", title = "Dana Darurat", targetAmount = 50000000L, currentAmount = 32500000L, deadline = "Desember $currentYear", category = "Keamanan Finansial"),
+            SavingsGoal(id = "2", title = "Liburan ke Jepang", targetAmount = 25000000L, currentAmount = 14200000L, deadline = "Juni ${currentYear + 1}", category = "Liburan"),
+            SavingsGoal(id = "3", title = "DP Rumah Idaman", targetAmount = 150000000L, currentAmount = 45000000L, deadline = "Desember ${currentYear + 2}", category = "Properti"),
+            SavingsGoal(id = "4", title = "Upgrade Laptop Kerja", targetAmount = 22000000L, currentAmount = 18500000L, deadline = "Desember $currentYear", category = "Elektronik")
         )
     )
     val savingsGoals: StateFlow<List<SavingsGoal>> = _savingsGoals.asStateFlow()
 
     private val _subscriptions = MutableStateFlow(
         listOf(
-            SubscriptionItem(id = "1", name = "Netflix Premium 4K", cost = 186000L, billingCycle = "Bulanan", nextDueDate = "2024-11-04", active = true, category = "Streaming Film"),
-            SubscriptionItem(id = "2", name = "Spotify Family", cost = 86900L, billingCycle = "Bulanan", nextDueDate = "2024-11-12", active = true, category = "Musik"),
-            SubscriptionItem(id = "3", name = "Telkomsel Halo 50GB", cost = 150000L, billingCycle = "Bulanan", nextDueDate = "2024-11-20", active = true, category = "Kuota & SIM"),
-            SubscriptionItem(id = "4", name = "WiFi Indihome 50Mbps", cost = 375000L, billingCycle = "Bulanan", nextDueDate = "2024-11-18", active = true, category = "Internet Rumah"),
-            SubscriptionItem(id = "5", name = "Gym Fitness First", cost = 450000L, billingCycle = "Bulanan", nextDueDate = "2024-11-01", active = true, category = "Kesehatan")
+            SubscriptionItem(id = "1", name = "Netflix Premium 4K", cost = 186000L, billingCycle = "Bulanan", nextDueDate = getFutureDate(4), active = true, category = "Streaming Film"),
+            SubscriptionItem(id = "2", name = "Spotify Family", cost = 86900L, billingCycle = "Bulanan", nextDueDate = getFutureDate(11), active = true, category = "Musik"),
+            SubscriptionItem(id = "3", name = "Telkomsel Halo 50GB", cost = 150000L, billingCycle = "Bulanan", nextDueDate = getFutureDate(16), active = true, category = "Kuota & SIM"),
+            SubscriptionItem(id = "4", name = "WiFi Indihome 50Mbps", cost = 375000L, billingCycle = "Bulanan", nextDueDate = getFutureDate(21), active = true, category = "Internet Rumah"),
+            SubscriptionItem(id = "5", name = "Gym Fitness First", cost = 450000L, billingCycle = "Bulanan", nextDueDate = getFutureDate(25), active = true, category = "Kesehatan")
         )
     )
     val subscriptions: StateFlow<List<SubscriptionItem>> = _subscriptions.asStateFlow()
