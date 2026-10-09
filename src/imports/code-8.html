@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-secondary-container": "#00311f", "inverse-surface": "#dae2fd", "on-tertiary": "#68000a", "on-surface": "#dae2fd", "on-primary-fixed": "#00174b", "on-error": "#690005", "on-tertiary-fixed-variant": "#930013", "surface": "#0b1326", "secondary-fixed-dim": "#4edea3", "on-background": "#dae2fd", "surface-tint": "#b4c5ff", "secondary-fixed": "#6ffbbe", "primary-fixed": "#dbe1ff", "surface-container-highest": "#2d3449", "on-secondary": "#003824", "surface-variant": "#2d3449", "surface-bright": "#31394d", "on-secondary-fixed-variant": "#005236", "tertiary-fixed-dim": "#ffb3ad", "on-secondary-fixed": "#002113", "background": "#0b1326", "surface-dim": "#0b1326", "on-tertiary-fixed": "#410004", "on-surface-variant": "#c3c6d7", "secondary": "#4edea3", "surface-container": "#171f33", "outline": "#8d90a0", "on-error-container": "#ffdad6", "primary-fixed-dim": "#b4c5ff", "on-primary-container": "#eeefff", "on-primary": "#002a78", "on-primary-fixed-variant": "#003ea8", "tertiary-container": "#cf2c30", "primary-container": "#2563eb", "surface-container-lowest": "#060e20", "error-container": "#93000a", "inverse-primary": "#0053db", "surface-container-low": "#131b2e", "inverse-on-surface": "#283044", "outline-variant": "#434655", "surface-container-high": "#222a3d", "secondary-container": "#00a572", "error": "#ffb4ab", "on-tertiary-container": "#ffecea", "tertiary-fixed": "#ffdad7", "tertiary": "#ffb3ad", "primary": "#b4c5ff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "margin-tablet": "2rem", "gutter-sm": "0.75rem", "margin": "1.25rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin-desktop": "3rem", "gutter": "1rem" }, fontFamily: { "headline-lg": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "display-lg": ["Plus Jakarta Sans"], "display-lg-mobile": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "label-md": ["Inter"], "label-sm": ["Inter"], "metric-tabular": ["Inter"], "body-md": ["Inter"], "title-md": ["Inter"] }, fontSize: { "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }], "metric-tabular": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }] } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.25)]"><div class="h-20 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-secondary text-[24px]">account_balance_wallet</span></div><div class="flex flex-col justify-center"><div class="flex items-center gap-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold">FinTrack</span></div><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-none">Laporan</h1><p class="font-label-md text-label-md text-on-surface-variant leading-none mt-1">Analitik &amp; Evaluasi Kas</p></div></div><div class="flex items-center gap-space-sm"><button aria-label="Notifikasi Finansial" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors active:scale-95"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-20 pb-24 bg-surface"><div class="flex flex-col w-full relative">
+<!-- Layer Belakang: Konteks Jurnal Transaksi Laporan (Tersimulasi di bawah modal) -->
+<div class="px-margin pt-space-xs pb-space-lg flex flex-col gap-space-md opacity-35 filter blur-[2px] pointer-events-none select-none">
+<div class="bg-surface-container rounded-xl p-space-md shadow-md">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Ringkasan Bulan Ini</span>
+<span class="font-metric-tabular text-metric-tabular text-on-surface-variant">Okt 2024</span>
+</div>
+<div class="font-display-lg-mobile text-display-lg-mobile text-on-surface">Rp 24.850.000</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">28 transaksi tercatat dengan rekonsiliasi perbankan otomatis.</p>
+</div>
+<div class="flex flex-col gap-space-sm">
+<div class="p-space-md bg-surface-container-high rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-secondary/15 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface">Supermarket Grand Lucky</div>
+<div class="font-label-md text-label-md text-on-surface-variant">31 Okt • SCBD Jakarta</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-metric-tabular text-metric-tabular text-on-surface">-Rp 680.000</div>
+<span class="font-label-sm text-label-sm text-secondary">OCR Tersedia</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Focused Modal Sheet Backdrop Container -->
+<div class="fixed inset-0 z-50 flex flex-col justify-end bg-surface-container-lowest/80 backdrop-blur-md transition-opacity duration-300" id="receiptModalWrapper">
+<!-- Clickable dismiss area outside sheet -->
+<div class="flex-1 w-full" onclick="document.getElementById('receiptModalWrapper').classList.add('hidden')"></div>
+<!-- Scanned Receipt Inspection Bottom Sheet -->
+<div class="relative w-full max-h-[92vh] flex flex-col bg-surface-container-low rounded-t-xl shadow-2xl overflow-hidden animate-[slideUp_0.35s_cubic-bezier(0.16,1,0.3,1)]">
+<!-- Top Drag Handle & Subtle Surface Sheen -->
+<div class="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing">
+<div class="w-12 h-1.5 rounded-full bg-outline-variant/60"></div>
+</div>
+<!-- Modal Header -->
+<div class="px-margin pb-space-sm flex items-start justify-between">
+<div class="flex flex-col min-w-0 pr-2">
+<div class="inline-flex items-center gap-1.5 self-start px-2 py-0.5 rounded-full bg-secondary/15 text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-label-sm tracking-wide">BUKTI STRUK TERVERIFIKASI</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface mt-1.5 leading-tight">Detail Struk &amp; Ekstraksi OCR</h2>
+<p class="font-label-md text-label-md text-on-surface-variant mt-0.5 truncate">ID Transaksi: #TX-8921 • Dipindai via FinTrack AI Camera</p>
+</div>
+<button aria-label="Tutup Detail Struk" class="w-9 h-9 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-90 transition-transform" onclick="document.getElementById('receiptModalWrapper').classList.add('hidden')">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Scrollable Modal Content Body -->
+<div class="flex-1 overflow-y-auto px-margin pb-safe pt-space-xs space-y-space-md">
+<!-- Banner Visual Foto Asli Struk / Thumbnail AI Scanned Artifact -->
+<div class="relative w-full rounded-xl overflow-hidden bg-surface-container-highest flex items-center justify-between p-space-sm shadow-sm">
+<div class="flex items-center gap-space-sm">
+<div class="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="High-resolution close-up photo of a modern supermarket paper slip receipt illuminated under warm moody directional office lamp light, slight textured thermal paper crease, crisp sovereign slate ambient fintech atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU8BpG9ExPCBk-leGVNOG7q9E329yC6jzLiVC-RH0PYiG6PUqxjWTL_GGxXyCULV6G9aHhZTDMHoDPpDCj29eanoJztSwLYogd0JD53ZjnKLi-xqhBxmV-RrQ9heXjheHpM0kXktg2bJilSJiuasmJG-1zR0SjeK2aGiJgF1BQ4jbYdg8Mdsk8cwpUGWl9ywgt1d9Zn6ga8qZWUbeRQQD3AXtmr1WKLjQBJzDaMu8"/>
+<div class="absolute inset-0 bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-[18px]">document_scanner</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-on-surface">Foto Fisik Nota Kasir</span>
+<span class="font-label-md text-label-md text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                OCR AI Engine v4.2 • 300 DPI Raw
+              </span>
+</div>
+</div>
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-bright text-label-md font-label-md flex items-center gap-1 transition-colors" id="btnLihatFotoTop">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>Pratinjau</span>
+</button>
+</div>
+<!-- Digital Scanned Receipt Paper Card (Sovereign Monokrom Kasir Card) -->
+<div class="relative bg-surface-container rounded-xl p-space-md shadow-xl overflow-hidden">
+<!-- Subtle Glow Background Highlight -->
+<div class="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-primary/10 blur-2xl pointer-events-none"></div>
+<!-- Thermal Receipt Slip Top Stamp -->
+<div class="flex flex-col items-center text-center pb-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary mb-1.5">
+<span class="material-symbols-outlined text-[24px]">local_mall</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm tracking-tight text-on-surface">GRAND LUCKY SUPERSTORE</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">SCBD Sudirman, Jakarta Selatan</p>
+<div class="flex items-center gap-2 mt-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<span>31 Okt 2024 • 19:45 WIB</span>
+<span>•</span>
+<span>POS Reg #04</span>
+</div>
+</div>
+<!-- Jagged/Perforated Slip Visual Divider (SVG Zigzag cut line) -->
+<div class="my-space-sm relative flex items-center justify-between text-surface-container-highest opacity-75">
+<svg class="w-full h-3" fill="currentColor" preserveaspectratio="none" viewbox="0 0 400 12">
+<path d="M0,0 L10,12 L20,0 L30,12 L40,0 L50,12 L60,0 L70,12 L80,0 L90,12 L100,0 L110,12 L120,0 L130,12 L140,0 L150,12 L160,0 L170,12 L180,0 L190,12 L200,0 L210,12 L220,0 L230,12 L240,0 L250,12 L260,0 L270,12 L280,0 L290,12 L300,0 L310,12 L320,0 L330,12 L340,0 L350,12 L360,0 L370,12 L380,0 L390,12 L400,0 L400,12 L0,12 Z"></path>
+</svg>
+</div>
+<!-- Section Label OCR Items -->
+<div class="flex items-center justify-between py-1 mb-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Item Belanja (6 Baris OCR)</span>
+<div class="flex items-center gap-1 text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+<span>100% Parsing Sukses</span>
+</div>
+</div>
+<!-- Itemized Receipt List -->
+<div class="flex flex-col gap-space-sm">
+<!-- Row 1 -->
+<div class="flex items-start justify-between">
+<div class="min-w-0 pr-2">
+<p class="font-body-md text-body-md text-on-surface font-medium truncate">Minyak Goreng Sania 2L</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">2 × Rp 38.000</p>
+</div>
+<div class="font-metric-tabular text-metric-tabular text-on-surface flex-shrink-0">Rp 76.000</div>
+</div>
+<!-- Row 2 -->
+<div class="flex items-start justify-between">
+<div class="min-w-0 pr-2">
+<p class="font-body-md text-body-md text-on-surface font-medium truncate">Daging Sapi Tenderloin 500g</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">1 × Rp 185.000</p>
+</div>
+<div class="font-metric-tabular text-metric-tabular text-on-surface flex-shrink-0">Rp 185.000</div>
+</div>
+<!-- Row 3 -->
+<div class="flex items-start justify-between">
+<div class="min-w-0 pr-2">
+<p class="font-body-md text-body-md text-on-surface font-medium truncate">Beras Organik Mentik 5kg</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">1 × Rp 115.000</p>
+</div>
+<div class="font-metric-tabular text-metric-tabular text-on-surface flex-shrink-0">Rp 115.000</div>
+</div>
+<!-- Row 4 -->
+<div class="flex items-start justify-between">
+<div class="min-w-0 pr-2">
+<p class="font-body-md text-body-md text-on-surface font-medium truncate">Susu Segar Greenfields 1L</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">3 × Rp 32.000</p>
+</div>
+<div class="font-metric-tabular text-metric-tabular text-on-surface flex-shrink-0">Rp 96.000</div>
+</div>
+<!-- Row 5 -->
+<div class="flex items-start justify-between">
+<div class="min-w-0 pr-2">
+<p class="font-body-md text-body-md text-on-surface font-medium truncate">Aneka Buah Apel &amp; Jeruk Segar</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">1 × Rp 128.000</p>
+</div>
+<div class="font-metric-tabular text-metric-tabular text-on-surface flex-shrink-0">Rp 128.000</div>
+</div>
+<!-- Row 6 -->
+<div class="flex items-start justify-between">
+<div class="min-w-0 pr-2">
+<p class="font-body-md text-body-md text-on-surface font-medium truncate">Roti Gandum &amp; Keju Slice</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">1 × Rp 80.000</p>
+</div>
+<div class="font-metric-tabular text-metric-tabular text-on-surface flex-shrink-0">Rp 80.000</div>
+</div>
+</div>
+<!-- Total Calculation Section -->
+<div class="mt-space-md pt-space-sm bg-surface-container-high/60 rounded-lg p-space-sm space-y-1.5">
+<div class="flex items-center justify-between font-label-md text-label-md text-on-surface-variant">
+<span>Subtotal Pembelian</span>
+<span class="font-metric-tabular">Rp 680.000</span>
+</div>
+<div class="flex items-center justify-between font-label-md text-label-md text-on-surface-variant">
+<span>PPN (11% Termasuk)</span>
+<span class="font-metric-tabular">Rp 67.387</span>
+</div>
+<div class="pt-1.5 flex items-center justify-between text-on-surface">
+<div>
+<span class="font-title-md text-title-md font-semibold block">Total Dibayar</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">BCA Platinum Debit •••• 8821</span>
+</div>
+<span class="font-display-lg-mobile text-display-lg-mobile text-secondary font-bold">Rp 680.000</span>
+</div>
+</div>
+<!-- AI Confidence Level Badge -->
+<div class="mt-space-sm p-space-xs px-space-sm rounded-lg bg-surface-container-highest flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified_user</span>
+<span class="font-label-sm text-label-sm text-on-surface">Tingkat Keyakinan OCR: <strong class="text-secondary font-semibold">99.4% (Tinggi)</strong></span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">No Discrepancy</span>
+</div>
+<!-- Bottom Receipt Barcode Mockup -->
+<div class="mt-space-md pt-space-xs flex flex-col items-center">
+<div class="w-48 h-8 flex items-center justify-between gap-1 opacity-70">
+<span class="w-1 h-full bg-on-surface"></span>
+<span class="w-0.5 h-full bg-on-surface"></span>
+<span class="w-1.5 h-full bg-on-surface"></span>
+<span class="w-0.5 h-full bg-on-surface"></span>
+<span class="w-2 h-full bg-on-surface"></span>
+<span class="w-1 h-full bg-on-surface"></span>
+<span class="w-0.5 h-full bg-on-surface"></span>
+<span class="w-1 h-full bg-on-surface"></span>
+<span class="w-2 h-full bg-on-surface"></span>
+<span class="w-0.5 h-full bg-on-surface"></span>
+<span class="w-1.5 h-full bg-on-surface"></span>
+<span class="w-1 h-full bg-on-surface"></span>
+<span class="w-0.5 h-full bg-on-surface"></span>
+<span class="w-2 h-full bg-on-surface"></span>
+<span class="w-1 h-full bg-on-surface"></span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest mt-1">GL-SCBD-20241031-8921</span>
+</div>
+</div>
+<!-- Informasi Validasi & Rekonsiliasi Card -->
+<div class="bg-surface-container rounded-xl p-space-md shadow-md space-y-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">fact_check</span>
+<h4 class="font-title-md text-title-md text-on-surface">Validasi &amp; Rekonsiliasi Otomatis</h4>
+</div>
+<div class="grid grid-cols-1 gap-2 pt-1">
+<!-- Row Validasi 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">restaurant</span>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Alokasi Anggaran</div>
+<div class="font-title-md text-title-md text-on-surface">Makanan &amp; Minuman (Groceries)</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+</div>
+<!-- Row Validasi 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">sync_alt</span>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Kesesuaian Mutasi Rekening</div>
+<div class="font-title-md text-title-md text-on-surface">100% Cocok (BCA Debit Sync)</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-label-sm text-label-sm">Matched</span>
+</div>
+<!-- Row Validasi 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">enhanced_encryption</span>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Integritas Arsip Digital</div>
+<div class="font-body-md text-body-md text-on-surface truncate">SHA-256 Valid: 8f9b4c...91a2</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]">lock</span>
+</div>
+</div>
+</div>
+<!-- Dynamic Action Buttons Section -->
+<div class="pt-space-xs pb-space-md flex flex-col gap-space-sm">
+<!-- Primary Royal Blue CTA -->
+<button class="w-full h-12 rounded-lg bg-primary-container text-on-primary-container font-title-md text-title-md font-semibold flex items-center justify-center gap-2 shadow-lg hover:brightness-110 active:scale-[0.98] transition-all" id="btnLihatFotoFull">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+<span>Lihat Foto Asli Struk</span>
+</button>
+<!-- Secondary Grid CTA Buttons -->
+<div class="grid grid-cols-2 gap-space-sm">
+<button class="h-11 rounded-lg bg-surface-container-high text-on-surface font-title-md text-title-md flex items-center justify-center gap-1.5 hover:bg-surface-bright active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px] text-primary">download</span>
+<span>Unduh PDF/JPG</span>
+</button>
+<button class="h-11 rounded-lg bg-surface-container-high text-on-surface font-title-md text-title-md flex items-center justify-center gap-1.5 hover:bg-surface-bright active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px] text-secondary">edit_note</span>
+<span>Koreksi Data</span>
+</button>
+</div>
+<!-- Flat Dismissal Button -->
+<button class="w-full py-2 text-center text-on-surface-variant hover:text-on-surface font-title-md text-title-md transition-colors" onclick="document.getElementById('receiptModalWrapper').classList.add('hidden')">
+            Kembali ke Rekap Jurnal
+          </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Foto Fullscreen Lightbox Modal (Micro-interaction) -->
+<div class="hidden fixed inset-0 z-50 bg-surface-container-lowest/95 backdrop-blur-lg flex flex-col p-margin justify-between items-center" id="photoLightbox">
+<div class="w-full flex items-center justify-between pt-safe">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[22px]">photo_camera</span>
+<span class="font-title-md text-title-md">Dokumen Asli #TX-8921</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-bright" id="btnCloseLightbox">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="my-auto max-w-sm w-full bg-surface-container rounded-xl overflow-hidden shadow-2xl relative">
+<img class="w-full h-auto max-h-[65vh] object-contain rounded-lg" data-alt="High-resolution full shot photo of a printed Indonesian supermarket cash receipt on receipt paper from Grand Lucky SCBD, clear itemized lines, clean corporate fintech document preview presentation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdkPfVrHt61ydSfJOin0Pzdn49gb-U82YYI1RsMO_nXaNE-ydufZLBKbuSIdux4q4iYeRUxx3ha9gh88iF-4ZnXhx4wEfb94V3UdGLTTLpWY_kXsicdKYXCU1FA05w1YjA--k9v-6f5hIdLL-ljfVwojPcVSmbIi7zCtZsD8l3ywgzaQTXqK4gJVDsAFOBhPIzLL5N8K8WJfOda2PWGjiU0MnJnNFgKVARmisHgAU"/>
+<div class="p-space-sm bg-surface-container flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Kamera: Sony IMX Sensor • Flash Otomatis</span>
+<span class="text-secondary font-semibold">Tervalidasi FinTrack AI</span>
+</div>
+</div>
+<div class="w-full pb-safe flex justify-center">
+<button class="px-space-lg py-2.5 rounded-lg bg-surface-container-high text-on-surface font-title-md text-title-md active:scale-95 transition-transform" id="btnDismissLightbox">
+        Tutup Tampilan Foto
+      </button>
+</div>
+</div>
+</div>
+<script>
+  // Simple interactive bindings for receipt modal inspection
+  const btnLihatFotoTop = document.getElementById('btnLihatFotoTop');
+  const btnLihatFotoFull = document.getElementById('btnLihatFotoFull');
+  const photoLightbox = document.getElementById('photoLightbox');
+  const btnCloseLightbox = document.getElementById('btnCloseLightbox');
+  const btnDismissLightbox = document.getElementById('btnDismissLightbox');
+
+  function openPhoto() {
+    if (photoLightbox) photoLightbox.classList.remove('hidden');
+  }
+
+  function closePhoto() {
+    if (photoLightbox) photoLightbox.classList.add('hidden');
+  }
+
+  if (btnLihatFotoTop) btnLihatFotoTop.addEventListener('click', openPhoto);
+  if (btnLihatFotoFull) btnLihatFotoFull.addEventListener('click', openPhoto);
+  if (btnCloseLightbox) btnCloseLightbox.addEventListener('click', closePhoto);
+  if (btnDismissLightbox) btnDismissLightbox.addEventListener('click', closePhoto);
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.35)]" data-active-classes="text-secondary"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center gap-space-xs min-w-[64px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="dasbor" href="#"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-sm text-label-sm">Dasbor</span></a><a class="flex flex-col items-center justify-center gap-space-xs min-w-[64px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="transaksi" href="#"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-sm text-label-sm">Transaksi</span></a><a class="flex flex-col items-center justify-center gap-space-xs min-w-[64px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="anggaran" href="#"><span class="material-symbols-outlined text-[24px]">pie_chart</span><span class="font-label-sm text-label-sm">Anggaran</span></a><a class="flex flex-col items-center justify-center gap-space-xs min-w-[64px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="laporan" href="#"><span class="material-symbols-outlined text-[24px]">bar_chart</span><span class="font-label-sm text-label-sm">Laporan</span></a></div></nav></body></html>

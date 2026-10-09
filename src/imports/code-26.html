@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#0b1326;color:#dae2fd;-webkit-tap-highlight-color:transparent;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "outline-variant": "#434655", "surface-container-lowest": "#060e20", "on-tertiary-container": "#ffecea", "on-error-container": "#ffdad6", "outline": "#8d90a0", "surface-container-high": "#222a3d", "primary-fixed": "#dbe1ff", "inverse-primary": "#0053db", "secondary-fixed": "#6ffbbe", "tertiary-container": "#cf2c30", "surface-container-low": "#131b2e", "on-secondary-fixed-variant": "#005236", "surface-variant": "#2d3449", "tertiary": "#ffb3ad", "surface-container": "#171f33", "on-primary-fixed-variant": "#003ea8", "on-surface-variant": "#c3c6d7", "error": "#ffb4ab", "secondary-fixed-dim": "#4edea3", "surface-container-highest": "#2d3449", "on-tertiary": "#68000a", "secondary-container": "#00a572", "primary-fixed-dim": "#b4c5ff", "on-secondary-container": "#00311f", "tertiary-fixed-dim": "#ffb3ad", "on-background": "#dae2fd", "on-secondary": "#003824", "on-tertiary-fixed-variant": "#930013", "on-error": "#690005", "inverse-surface": "#dae2fd", "surface-bright": "#31394d", "on-secondary-fixed": "#002113", "on-primary": "#002a78", "background": "#0b1326", "surface-tint": "#b4c5ff", "tertiary-fixed": "#ffdad7", "inverse-on-surface": "#283044", "on-primary-fixed": "#00174b", "secondary": "#4edea3", "surface": "#0b1326", "error-container": "#93000a", "primary-container": "#2563eb", "on-tertiary-fixed": "#410004", "on-surface": "#dae2fd", "surface-dim": "#0b1326", "on-primary-container": "#eeefff", "primary": "#b4c5ff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-lg": "1.5rem", "margin": "1.25rem", "space-sm": "0.5rem", "gutter-sm": "0.75rem", "margin-tablet": "2rem", "space-md": "1rem", "gutter": "1rem", "space-xs": "0.25rem", "space-xl": "2rem", "margin-desktop": "3rem" }, fontFamily: { "body-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "display-lg-mobile": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "title-md": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "label-md": ["Inter"], "metric-tabular": ["Inter"], "display-lg": ["Plus Jakarta Sans"] }, fontSize: { "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }], "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "metric-tabular": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary selection:text-on-primary"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.25)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs"><button aria-label="Kembali" class="w-11 h-11 -ml-space-xs flex items-center justify-center rounded-lg text-on-surface hover:text-primary transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Peta &amp; Lokasi Pengeluaran</h1></div><div class="flex items-center gap-space-xs"><button aria-label="Filter dan Peta" class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">tune</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-surface pt-16 pb-20 pb-safe"><div class="flex flex-col w-full pb-8 select-none">
+<!-- Search & Filter Controls -->
+<section class="px-margin pt-space-sm pb-space-sm flex flex-col gap-space-sm">
+<!-- Search Bar -->
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full h-12 pl-10 pr-10 bg-surface-container-low text-on-surface font-body-md text-body-md rounded-xl placeholder:text-outline focus:outline-none focus:bg-surface-container focus:shadow-[0_0_0_2px_#2563eb] transition-all" id="geoSearchInput" placeholder="Cari lokasi, toko, atau merchant..." type="text"/>
+<button aria-label="Hapus Pencarian" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-outline hover:text-on-surface transition-colors hidden" id="clearSearchBtn" onclick="const input = document.getElementById('geoSearchInput'); input.value = ''; this.classList.add('hidden'); input.focus();" type="button">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</button>
+</div>
+<!-- Quick Filter Chips Scrollable -->
+<div class="flex items-center gap-space-xs overflow-x-auto no-scrollbar -mx-margin px-margin py-0.5">
+<button class="filter-chip active flex-shrink-0 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md flex items-center gap-1.5 shadow-sm transition-transform active:scale-95" data-filter="all">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+<span>Semua Wilayah (28)</span>
+</button>
+<button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-1 transition-all active:scale-95" data-filter="jabodetabek">
+<span class="material-symbols-outlined text-[14px]">near_me</span>
+<span>Jabodetabek</span>
+</button>
+<button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-1 transition-all active:scale-95" data-filter="cafe">
+<span class="material-symbols-outlined text-[14px]">coffee</span>
+<span>Resto &amp; Kafe (14)</span>
+</button>
+<button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-1 transition-all active:scale-95" data-filter="supermarket">
+<span class="material-symbols-outlined text-[14px]">local_grocery_store</span>
+<span>Supermarket (8)</span>
+</button>
+<button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-1 transition-all active:scale-95" data-filter="month">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span>Bulan Ini</span>
+</button>
+<button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-1 transition-all active:scale-95" data-filter="highest">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>Rp Terbesar</span>
+</button>
+</div>
+</section>
+<!-- Interactive Map Stage -->
+<section class="px-margin my-space-xs relative">
+<div class="relative w-full h-[360px] rounded-2xl bg-surface-container-lowest overflow-hidden shadow-xl shadow-black/40">
+<!-- Realistic Stylized Dark Vector Map Canvas -->
+<svg class="absolute inset-0 w-full h-full object-cover opacity-90" fill="none" viewbox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Grid Pattern -->
+<pattern height="40" id="grid" patternunits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" opacity="0.6" stroke="#171f33" stroke-width="0.8"></path>
+</pattern>
+<!-- Water Glow -->
+<filter height="120%" id="waterGlow" width="120%" x="-10%" y="-10%">
+<fegaussianblur result="blur" stddeviation="3"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+</defs>
+<!-- District Land Masses & Zones -->
+<rect fill="#060e20" height="360" width="400"></rect>
+<rect fill="url(#grid)" height="360" width="400"></rect>
+<!-- Parks / Dense Urban Green Enclaves -->
+<path d="M 40 180 Q 70 160 95 190 T 120 250 Q 80 280 40 240 Z" fill="#00311f" opacity="0.35"></path>
+<path d="M 280 40 Q 320 20 360 50 T 380 120 Q 330 130 290 90 Z" fill="#00311f" opacity="0.3"></path>
+<!-- Ciliwung River Curve (Glowing Dark Teal) -->
+<path d="M -10 60 C 80 80, 110 150, 170 200 C 230 250, 290 280, 420 320" filter="url(#waterGlow)" opacity="0.5" stroke="#005236" stroke-linecap="round" stroke-width="12"></path>
+<path d="M -10 60 C 80 80, 110 150, 170 200 C 230 250, 290 280, 420 320" opacity="0.7" stroke="#00a572" stroke-linecap="round" stroke-width="3"></path>
+<!-- Urban Secondary Roads -->
+<path d="M 20 340 L 380 40" stroke="#1b2438" stroke-width="5"></path>
+<path d="M 60 20 L 140 350" stroke="#1b2438" stroke-width="4"></path>
+<path d="M 220 10 L 320 350" stroke="#1b2438" stroke-width="4"></path>
+<path d="M 10 130 L 390 190" stroke="#1b2438" stroke-width="4.5"></path>
+<path d="M 30 260 L 370 270" stroke="#1b2438" stroke-width="3.5"></path>
+<path d="M 120 40 L 380 230" stroke="#1b2438" stroke-width="3"></path>
+<!-- Primary Arterials / Highways (Jl. Sudirman, Gatot Subroto) -->
+<!-- Gatot Subroto -->
+<path d="M 0 160 Q 200 140 400 180" opacity="0.4" stroke="#2563eb" stroke-width="3"></path>
+<path d="M 0 160 Q 200 140 400 180" opacity="0.4" stroke="#dbe1ff" stroke-dasharray="8 6" stroke-width="1"></path>
+<!-- Sudirman Main Spine -->
+<path d="M 195 0 L 175 360" opacity="0.55" stroke="#2563eb" stroke-width="4"></path>
+<path d="M 195 0 L 175 360" opacity="0.5" stroke="#ffffff" stroke-dasharray="10 8" stroke-width="1.2"></path>
+<!-- Inner City Roundabouts & Junctions -->
+<circle cx="187" cy="150" fill="#131b2e" opacity="0.8" r="14" stroke="#2563eb" stroke-width="2"></circle>
+<circle cx="187" cy="150" fill="#4edea3" opacity="0.9" r="5"></circle>
+<circle cx="90" cy="100" fill="#171f33" r="8" stroke="#434655" stroke-width="1.5"></circle>
+<circle cx="310" cy="220" fill="#171f33" r="10" stroke="#434655" stroke-width="1.5"></circle>
+<!-- District Text Labels on Canvas -->
+<text fill="#434655" font-family="Inter" font-size="9" font-weight="700" letter-spacing="1" x="50" y="80">SENAYAN</text>
+<text fill="#8d90a0" font-family="Inter" font-size="9" font-weight="700" letter-spacing="1.5" x="175" y="115">SCBD</text>
+<text fill="#434655" font-family="Inter" font-size="9" font-weight="700" letter-spacing="1" x="210" y="220">SENOPATI</text>
+<text fill="#434655" font-family="Inter" font-size="9" font-weight="700" letter-spacing="1" x="270" y="145">KUNINGAN</text>
+<text fill="#434655" font-family="Inter" font-size="9" font-weight="700" letter-spacing="1" x="190" y="320">JAKARTA SELATAN</text>
+</svg>
+<!-- Floating Stat Pill Header Overlay -->
+<div class="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+<div class="px-3 py-1.5 rounded-full bg-surface-container-lowest/85 backdrop-blur-md shadow-md flex items-center gap-2 pointer-events-auto">
+<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">28 Lokasi Terlacak</span>
+<span class="text-outline-variant">•</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">87% GPS Aktif</span>
+</div>
+<button aria-label="Ganti Tampilan Peta" class="w-9 h-9 rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-on-surface hover:text-primary flex items-center justify-center shadow-md pointer-events-auto active:scale-95 transition-transform" id="mapTypeToggle" title="Tampilan Peta" type="button">
+<span class="material-symbols-outlined text-[19px]">layers</span>
+</button>
+</div>
+<!-- Map Control Overlays (Right Side Stack) -->
+<div class="absolute right-3 bottom-14 flex flex-col gap-2 z-10">
+<button aria-label="Lokasi Saya" class="w-10 h-10 rounded-xl bg-surface-container-lowest/90 backdrop-blur-md text-secondary hover:bg-surface-container-high shadow-lg flex items-center justify-center transition-all active:scale-90" id="myLocationBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">my_location</span>
+</button>
+<div class="flex flex-col rounded-xl bg-surface-container-lowest/90 backdrop-blur-md overflow-hidden shadow-lg">
+<button aria-label="Perbesar" class="w-10 h-9 text-on-surface hover:bg-surface-container-high flex items-center justify-center transition-colors active:bg-surface-container" onclick="this.classList.add('text-primary'); setTimeout(() =&gt; this.classList.remove('text-primary'), 200);" type="button">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<div class="h-[1px] w-full bg-surface-variant/40"></div>
+<button aria-label="Perkecil" class="w-10 h-9 text-on-surface hover:bg-surface-container-high flex items-center justify-center transition-colors active:bg-surface-container" onclick="this.classList.add('text-primary'); setTimeout(() =&gt; this.classList.remove('text-primary'), 200);" type="button">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+</div>
+</div>
+<!-- INTERACTIVE MAP PINS -->
+<!-- Pin 1: Hero / Selected: Grand Lucky SCBD -->
+<div class="marker-pin absolute left-[45%] top-[33%] -translate-x-1/2 -translate-y-full cursor-pointer z-20 transition-all duration-300 transform scale-105" id="marker-grandlucky" onclick="selectMerchant('grandlucky')">
+<!-- Blue Pulsing Ring Behind Pin -->
+<span class="absolute -inset-2.5 rounded-full bg-primary-container/30 animate-pulse"></span>
+<div class="relative flex flex-col items-center">
+<div class="px-2.5 py-1 rounded-full bg-surface-container-lowest text-on-surface shadow-xl flex items-center gap-1.5 shadow-primary-container/40">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-headline-sm text-[12px] font-bold tracking-tight text-on-surface">Rp 468.5k</span>
+</div>
+<div class="w-8 h-8 -mt-0.5 rounded-full bg-primary-container text-on-primary-container shadow-lg flex items-center justify-center transition-transform hover:scale-110">
+<span class="material-symbols-outlined text-[17px]">shopping_basket</span>
+</div>
+<div class="w-1.5 h-2 bg-primary-container rounded-b-full -mt-0.5"></div>
+</div>
+</div>
+<!-- Pin 2: Kopi Kenangan Senopati -->
+<div class="marker-pin absolute left-[62%] top-[56%] -translate-x-1/2 -translate-y-full cursor-pointer z-10 transition-all duration-300 opacity-90 hover:opacity-100 hover:scale-105" id="marker-kenangan" onclick="selectMerchant('kenangan')">
+<div class="relative flex flex-col items-center">
+<div class="px-2 py-0.5 rounded-full bg-surface-container-lowest/90 text-on-surface shadow-md flex items-center gap-1">
+<span class="font-label-sm text-label-sm font-semibold text-tertiary">Rp 45k</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-surface-container-high text-tertiary shadow-md flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">local_cafe</span>
+</div>
+<div class="w-1 h-1.5 bg-surface-container-high rounded-b-full"></div>
+</div>
+</div>
+<!-- Pin 3: Plaza Indonesia -->
+<div class="marker-pin absolute left-[44%] top-[12%] -translate-x-1/2 -translate-y-full cursor-pointer z-10 transition-all duration-300 opacity-90 hover:opacity-100 hover:scale-105" id="marker-plazaindo" onclick="selectMerchant('plazaindo')">
+<div class="relative flex flex-col items-center">
+<div class="px-2 py-0.5 rounded-full bg-surface-container-lowest/90 text-on-surface shadow-md flex items-center gap-1">
+<span class="font-label-sm text-label-sm font-semibold text-primary">Rp 1.25M</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-surface-container-high text-primary shadow-md flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">checkroom</span>
+</div>
+<div class="w-1 h-1.5 bg-surface-container-high rounded-b-full"></div>
+</div>
+</div>
+<!-- Pin 4: SPBU Pertamina Kuningan -->
+<div class="marker-pin absolute left-[78%] top-[40%] -translate-x-1/2 -translate-y-full cursor-pointer z-10 transition-all duration-300 opacity-90 hover:opacity-100 hover:scale-105" id="marker-spbu" onclick="selectMerchant('spbu')">
+<div class="relative flex flex-col items-center">
+<div class="px-2 py-0.5 rounded-full bg-surface-container-lowest/90 text-on-surface shadow-md flex items-center gap-1">
+<span class="font-label-sm text-label-sm font-semibold text-secondary-fixed">Rp 250k</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-surface-container-high text-secondary-fixed shadow-md flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">local_gas_station</span>
+</div>
+<div class="w-1 h-1.5 bg-surface-container-high rounded-b-full"></div>
+</div>
+</div>
+<!-- Pin 5: Sushi Tei Senayan City -->
+<div class="marker-pin absolute left-[22%] top-[48%] -translate-x-1/2 -translate-y-full cursor-pointer z-10 transition-all duration-300 opacity-90 hover:opacity-100 hover:scale-105" id="marker-sushitei" onclick="selectMerchant('sushitei')">
+<div class="relative flex flex-col items-center">
+<div class="px-2 py-0.5 rounded-full bg-surface-container-lowest/90 text-on-surface shadow-md flex items-center gap-1">
+<span class="font-label-sm text-label-sm font-semibold text-tertiary">Rp 385k</span>
+</div>
+<div class="w-6 h-6 rounded-full bg-surface-container-high text-tertiary shadow-md flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">restaurant</span>
+</div>
+<div class="w-1 h-1.5 bg-surface-container-high rounded-b-full"></div>
+</div>
+</div>
+<!-- Mini Live GPS Calibration Badge in Bottom Left -->
+<div class="absolute bottom-3 left-3 flex items-center gap-1.5 bg-surface-container-lowest/80 backdrop-blur-md px-2.5 py-1 rounded-lg">
+<span class="material-symbols-outlined text-[14px] text-secondary">satellite_alt</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Akurasi ±4 meter</span>
+</div>
+</div>
+</section>
+<!-- Active Selected Merchant Card (Dynamic Floating Sheet) -->
+<section class="px-margin -mt-2 relative z-30">
+<div class="w-full bg-surface-container rounded-2xl p-space-md shadow-2xl shadow-black/50 transition-all duration-300" id="merchantCard">
+<!-- Merchant Header -->
+<div class="flex items-start justify-between gap-space-sm pb-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-11 h-11 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center flex-shrink-0" id="mAvatarBg">
+<span class="material-symbols-outlined text-[24px]" id="mIcon">shopping_cart</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h2 class="font-title-md text-title-md text-on-surface font-bold truncate" id="mName">Grand Lucky Superstore - SCBD</h2>
+<span class="flex-shrink-0 px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-label-sm text-label-sm font-semibold" id="mCategoryTag">Supermarket</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant truncate mt-0.5" id="mAddress">Jl. Jend. Sudirman Kav. 52-53, Senayan, Kebayoran Baru</p>
+</div>
+</div>
+<button aria-label="Tutup Detail" class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center flex-shrink-0 transition-colors" onclick="toggleMerchantDetails()" type="button">
+<span class="material-symbols-outlined text-[18px]" id="expandChevron">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Quick Metrics Row -->
+<div class="grid grid-cols-2 gap-space-xs py-space-sm my-0.5 rounded-xl bg-surface-container-low px-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">Total Bulan Ini</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-metric-tabular text-metric-tabular text-on-surface font-bold" id="mTotalSpend">Rp 1.420.000</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed" id="mVisits">(3x)</span>
+</div>
+</div>
+<div class="flex flex-col pl-2">
+<span class="font-label-sm text-label-sm text-outline">Transaksi Terakhir</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-metric-tabular text-metric-tabular text-on-surface font-bold" id="mLastSpend">Rp 468.500</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="mLastTime">Kemarin</span>
+</div>
+</div>
+</div>
+<!-- Action Buttons Row -->
+<div class="flex items-center gap-2 pt-space-sm">
+<button class="flex-1 h-10 px-3 rounded-lg bg-primary-container hover:bg-inverse-primary text-on-primary-container font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-98" onclick="triggerToast('Membuka rincian belanja Grand Lucky...')" type="button">
+<span>Detail Transaksi</span>
+<span class="material-symbols-outlined text-[16px]">north_east</span>
+</button>
+<button class="h-10 px-3.5 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md font-medium flex items-center justify-center gap-1 transition-all active:scale-95" onclick="triggerToast('Mengarahkan ke Google Maps...')" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">directions</span>
+<span>Rute</span>
+</button>
+<button aria-label="Simpan Favorit" class="w-10 h-10 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface-variant hover:text-tertiary flex items-center justify-center transition-colors active:scale-95" onclick="this.classList.toggle('text-tertiary'); triggerToast('Tersimpan di tempat favorit!')" type="button">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Top Spending Locations Hotspots Section -->
+<section class="px-margin mt-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Top Hotspot Belanja</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-outline font-label-sm text-label-sm">Bulan November</span>
+</div>
+<button class="font-label-md text-label-md text-primary font-semibold hover:underline flex items-center" onclick="triggerToast('Menampilkan seluruh 28 wilayah...')" type="button">
+        Lihat Semua
+      </button>
+</div>
+<!-- Cluster Card 1 -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm hover:bg-surface-container transition-all cursor-pointer shadow-sm active:scale-99" onclick="selectMerchant('grandlucky')">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-xl bg-primary-container/15 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">storefront</span>
+</div>
+<span class="absolute -top-1.5 -left-1.5 px-1.5 py-0.2 rounded-full bg-primary text-on-primary font-label-sm text-[10px] font-bold">#1</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Kawasan SCBD &amp; Senopati</h3>
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[13px] text-outline">near_me</span>
+<span>1.2 km dari kantor • 12 transaksi</span>
+</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-metric-tabular text-metric-tabular text-on-surface font-bold">Rp 2.850.000</span>
+<p class="font-label-sm text-label-sm text-secondary font-medium">42% Pengeluaran</p>
+</div>
+</div>
+<!-- Progress Bar Segmented Visual -->
+<div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 42%;"></div>
+</div>
+</div>
+<!-- Cluster Card 2 -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm hover:bg-surface-container transition-all cursor-pointer shadow-sm active:scale-99" onclick="selectMerchant('plazaindo')">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-xl bg-tertiary-container/20 text-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">local_mall</span>
+</div>
+<span class="absolute -top-1.5 -left-1.5 px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface font-label-sm text-[10px] font-bold">#2</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Mall Grand Indonesia Area</h3>
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[13px] text-outline">near_me</span>
+<span>4.5 km dari rumah • 5 transaksi</span>
+</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-metric-tabular text-metric-tabular text-on-surface font-bold">Rp 1.720.000</span>
+<p class="font-label-sm text-label-sm text-outline font-medium">25% Pengeluaran</p>
+</div>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 25%;"></div>
+</div>
+</div>
+<!-- Cluster Card 3 -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm hover:bg-surface-container transition-all cursor-pointer shadow-sm active:scale-99" onclick="selectMerchant('spbu')">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/20 text-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">local_gas_station</span>
+</div>
+<span class="absolute -top-1.5 -left-1.5 px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface font-label-sm text-[10px] font-bold">#3</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">SPBU &amp; Tol Lingkar Luar</h3>
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[13px] text-outline">directions_car</span>
+<span>Mobilitas Rutin • 4 transaksi</span>
+</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-metric-tabular text-metric-tabular text-on-surface font-bold">Rp 650.000</span>
+<p class="font-label-sm text-label-sm text-outline font-medium">10% Pengeluaran</p>
+</div>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-secondary-container rounded-full" style="width: 10%;"></div>
+</div>
+</div>
+</section>
+<!-- Discreet Geolocation Security Badge -->
+<section class="px-margin mt-space-lg mb-space-sm">
+<div class="w-full p-space-md rounded-2xl bg-surface-container-lowest flex items-start gap-3.5">
+<div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<div class="flex-1 flex flex-col gap-1">
+<h4 class="font-title-md text-[14px] text-on-surface font-semibold">Privasi Geolokasi Terenkripsi</h4>
+<p class="font-body-md text-[12px] leading-relaxed text-on-surface-variant">
+          Koordinat disimpan secara lokal menggunakan enkripsi AES-256 dan hanya direkam saat transaksi diproses melalui kartu atau QRIS. Data lokasi tidak pernah dipindahtangankan.
+        </p>
+<div class="pt-1">
+<button class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1 hover:underline" onclick="triggerToast('Membuka pengaturan izin privasi lokasi GPS...')" type="button">
+<span>Atur Izin &amp; Riwayat Lokasi</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Minimal Interactive Toast Feedback -->
+<div class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-surface-bright text-on-surface font-label-md text-label-md shadow-2xl backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300" id="geoToast">
+    Pemberitahuan
+  </div>
+</div>
+<script>
+  // Merchant Database for Live Pin Toggling
+  const merchantData = {
+    grandlucky: {
+      name: "Grand Lucky Superstore - SCBD",
+      category: "Supermarket",
+      categoryColor: "bg-secondary/10 text-secondary",
+      address: "Jl. Jend. Sudirman Kav. 52-53, SCBD, Jakarta Selatan",
+      icon: "shopping_cart",
+      avatarBg: "bg-secondary/15 text-secondary",
+      totalSpend: "Rp 1.420.000",
+      visits: "(3x)",
+      lastSpend: "Rp 468.500",
+      lastTime: "Kemarin, 19:42 WIB"
+    },
+    kenangan: {
+      name: "Kopi Kenangan - Senopati",
+      category: "Kafe & Kopi",
+      categoryColor: "bg-tertiary/15 text-tertiary",
+      address: "Jl. Senopati No. 41, Selong, Kebayoran Baru",
+      icon: "local_cafe",
+      avatarBg: "bg-tertiary/15 text-tertiary",
+      totalSpend: "Rp 180.000",
+      visits: "(4x)",
+      lastSpend: "Rp 45.000",
+      lastTime: "Hari ini, 08:30 WIB"
+    },
+    plazaindo: {
+      name: "Plaza Indonesia Retail",
+      category: "Belanja & Fesyen",
+      categoryColor: "bg-primary-container/20 text-primary",
+      address: "Jl. M.H. Thamrin No. 28-30, Gondangdia, Menteng",
+      icon: "checkroom",
+      avatarBg: "bg-primary-container/20 text-primary",
+      totalSpend: "Rp 2.450.000",
+      visits: "(2x)",
+      lastSpend: "Rp 1.250.000",
+      lastTime: "12 Nov, 15:10 WIB"
+    },
+    spbu: {
+      name: "SPBU Pertamina 31.129 Kuningan",
+      category: "Bahan Bakar",
+      categoryColor: "bg-secondary-fixed/20 text-secondary-fixed",
+      address: "Jl. H. R. Rasuna Said Kav. C-22, Setiabudi",
+      icon: "local_gas_station",
+      avatarBg: "bg-secondary-fixed/20 text-secondary-fixed",
+      totalSpend: "Rp 650.000",
+      visits: "(3x)",
+      lastSpend: "Rp 250.000",
+      lastTime: "10 Nov, 07:15 WIB"
+    },
+    sushitei: {
+      name: "Sushi Tei - Senayan City",
+      category: "Restoran",
+      categoryColor: "bg-tertiary/15 text-tertiary",
+      address: "Senayan City Mall Lt. 4, Jl. Asia Afrika No. 19",
+      icon: "restaurant",
+      avatarBg: "bg-tertiary/15 text-tertiary",
+      totalSpend: "Rp 770.000",
+      visits: "(2x)",
+      lastSpend: "Rp 385.000",
+      lastTime: "07 Nov, 20:15 WIB"
+    }
+  };
+
+  function selectMerchant(key) {
+    const data = merchantData[key];
+    if (!data) return;
+
+    // Update active card contents
+    document.getElementById('mName').textContent = data.name;
+    document.getElementById('mAddress').textContent = data.address;
+    document.getElementById('mTotalSpend').textContent = data.totalSpend;
+    document.getElementById('mVisits').textContent = data.visits;
+    document.getElementById('mLastSpend').textContent = data.lastSpend;
+    document.getElementById('mLastTime').textContent = data.lastTime;
+    document.getElementById('mIcon').textContent = data.icon;
+
+    const catEl = document.getElementById('mCategoryTag');
+    catEl.className = "flex-shrink-0 px-2 py-0.5 rounded-full font-label-sm text-label-sm font-semibold " + data.categoryColor;
+    catEl.textContent = data.category;
+
+    const avatarEl = document.getElementById('mAvatarBg');
+    avatarEl.className = "w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 " + data.avatarBg;
+
+    // Reset scales of all pins
+    document.querySelectorAll('.marker-pin').forEach(pin => {
+      pin.classList.remove('scale-105', 'z-20');
+      pin.classList.add('opacity-90');
+    });
+
+    const activePin = document.getElementById('marker-' + key);
+    if (activePin) {
+      activePin.classList.add('scale-105', 'z-20');
+      activePin.classList.remove('opacity-90');
+    }
+
+    triggerToast('Lokasi dipilih: ' + data.name);
+  }
+
+  function triggerToast(text) {
+    const toast = document.getElementById('geoToast');
+    if (!toast) return;
+    toast.textContent = text;
+    toast.classList.remove('opacity-0', 'pointer-events-none');
+    toast.classList.add('opacity-100');
+    clearTimeout(window._geoToastTimeout);
+    window._geoToastTimeout = setTimeout(() => {
+      toast.classList.add('opacity-0', 'pointer-events-none');
+      toast.classList.remove('opacity-100');
+    }, 2400);
+  }
+
+  function toggleMerchantDetails() {
+    const card = document.getElementById('merchantCard');
+    const chevron = document.getElementById('expandChevron');
+    if (chevron.textContent === 'keyboard_arrow_down') {
+      chevron.textContent = 'keyboard_arrow_up';
+      triggerToast('Tampilan ringkas aktif');
+    } else {
+      chevron.textContent = 'keyboard_arrow_down';
+    }
+  }
+
+  // Filter Chips Interactions
+  document.querySelectorAll('.filter-chip').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-chip').forEach(c => {
+        c.classList.remove('bg-primary-container', 'text-on-primary-container');
+        c.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+      });
+      this.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+      this.classList.add('bg-primary-container', 'text-on-primary-container');
+      triggerToast('Filter diterapkan: ' + this.innerText.trim());
+    });
+  });
+
+  // Search Input Clear Button Visibility
+  const searchInput = document.getElementById('geoSearchInput');
+  const clearBtn = document.getElementById('clearSearchBtn');
+  if (searchInput && clearBtn) {
+    searchInput.addEventListener('input', function() {
+      if (this.value.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+    });
+  }
+
+  // Location Center Button
+  const myLocBtn = document.getElementById('myLocationBtn');
+  if (myLocBtn) {
+    myLocBtn.addEventListener('click', function() {
+      triggerToast('Mengalibrasi ulang ke posisi GPS Anda...');
+      this.classList.add('rotate-45');
+      setTimeout(() => this.classList.remove('rotate-45'), 400);
+    });
+  }
+
+  // Map Layer Toggle
+  const mapTypeToggle = document.getElementById('mapTypeToggle');
+  if (mapTypeToggle) {
+    let mode = 'vektor';
+    mapTypeToggle.addEventListener('click', function() {
+      mode = (mode === 'vektor') ? 'satelit' : 'vektor';
+      triggerToast('Beralih ke mode tampilan ' + mode);
+    });
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.35)]" data-active-classes="text-primary font-semibold"><div class="h-16 px-space-sm flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="dasbor" href="#"><span class="material-symbols-outlined text-[22px]">dashboard</span><span class="font-label-sm text-label-sm mt-0.5">Dasbor</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="transaksi" href="#"><span class="material-symbols-outlined text-[22px]">receipt_long</span><span class="font-label-sm text-label-sm mt-0.5">Transaksi</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="anggaran" href="#"><span class="material-symbols-outlined text-[22px]">account_balance_wallet</span><span class="font-label-sm text-label-sm mt-0.5">Anggaran</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="laporan" href="#"><span class="material-symbols-outlined text-[22px]">pie_chart</span><span class="font-label-sm text-label-sm mt-0.5">Laporan</span></a></div></nav></body></html>
