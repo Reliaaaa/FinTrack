@@ -1,5 +1,6 @@
 {
-  "description": "Generates tailored content or solutions quickly to meet user requests, enhancing productivity and creativity for diverse needs.",
+  "title": "FinTrack - Smart Personal Finance",
+  "description": "Smart personal finance and wealth management app with budget tracking, cash flow analytics, and multi-asset monitoring",
   "robots": {
     "index": false
   },
