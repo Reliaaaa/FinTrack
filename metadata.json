@@ -1,0 +1,8 @@
+{
+  "name": "FinTrack",
+  "description": "Smart personal finance and wealth management app with budget tracking, cash flow analytics, and multi-asset monitoring",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
