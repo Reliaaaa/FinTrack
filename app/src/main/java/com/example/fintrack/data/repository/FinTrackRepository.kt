@@ -668,6 +668,8 @@ object FinTrackRepository {
             _userProfile.value = _userProfile.value.copy(
                 name = prefs.userName,
                 nickname = prefs.userNickname.ifBlank { prefs.userName },
+                email = prefs.userEmail.ifBlank { "pengguna@fintrack.id" },
+                phone = prefs.userPhone.ifBlank { "+62 812-0000-0000" },
                 currency = prefs.currency,
                 biometricEnabled = prefs.biometricEnabled,
                 twoFactorEnabled = prefs.twoFactorEnabled
@@ -675,27 +677,95 @@ object FinTrackRepository {
         }
     }
 
-    fun completeOnboarding(name: String, nickname: String, initialBalance: Long) {
+    fun completeOnboarding(name: String, nickname: String, email: String, phone: String, initialBalance: Long) {
         val prefs = preferenceManager
         if (prefs != null) {
             prefs.isOnboarded = true
             prefs.userName = name
             prefs.userNickname = nickname
+            prefs.userEmail = email
+            prefs.userPhone = phone
         }
         _isOnboarded.value = true
         _userProfile.value = _userProfile.value.copy(
             name = name,
-            nickname = nickname
+            nickname = nickname,
+            email = email,
+            phone = phone
         )
-        // Set the primary account (BCA) to user's initial selected balance
-        _accounts.value = _accounts.value.map {
-            if (it.isPrimary) it.copy(amount = initialBalance) else it
+        // Reset all secondary balances to 0, and set the primary account to user's initial selected balance
+        _accounts.value = listOf(
+            Account(
+                id = "1",
+                name = "Kas & Rekening Utama",
+                type = "Bank",
+                amount = initialBalance,
+                accountNumber = "•••• 1001",
+                adminFee = 0L,
+                interestRate = 0.0,
+                isPrimary = true
+            ),
+            Account(
+                id = "2",
+                name = "Tabungan Digital / E-Wallet",
+                type = "E-Wallet",
+                amount = 0L,
+                accountNumber = phone.ifBlank { "0812 •••• 0001" },
+                adminFee = 0L,
+                interestRate = 0.0
+            ),
+            Account(
+                id = "3",
+                name = "Portofolio Sekuritas & Investasi",
+                type = "Sekuritas",
+                amount = 0L,
+                accountNumber = "ID: RDN-001",
+                cashRdn = 0L,
+                stockValue = 0L
+            )
+        )
+        // If initial balance is greater than 0, create an initial deposit transaction
+        if (initialBalance > 0) {
+            _transactions.value = listOf(
+                Transaction(
+                    id = System.currentTimeMillis(),
+                    name = "Saldo Awal Pendaftaran",
+                    category = "Pemasukan",
+                    amount = initialBalance,
+                    date = getTodayDate(),
+                    account = "Kas & Rekening Utama",
+                    note = "Setoran saldo awal akun FinTrack",
+                    type = "income"
+                )
+            )
+        } else {
+            _transactions.value = emptyList()
         }
     }
 
     fun resetAllData() {
         preferenceManager?.resetAllPreferences()
         _isOnboarded.value = false
-        _userProfile.value = UserProfile(name = "", nickname = "")
+        _userProfile.value = UserProfile(
+            name = "",
+            nickname = "",
+            email = "",
+            phone = "",
+            userCode = "USR-" + (100000..999999).random()
+        )
+        // Clear all accounts, balances, and transactions
+        _accounts.value = listOf(
+            Account(
+                id = "1",
+                name = "Kas & Rekening Utama",
+                type = "Bank",
+                amount = 0L,
+                accountNumber = "•••• 1001",
+                isPrimary = true
+            )
+        )
+        _transactions.value = emptyList()
+        _budgets.value = emptyList()
+        _savingsGoals.value = emptyList()
     }
 }

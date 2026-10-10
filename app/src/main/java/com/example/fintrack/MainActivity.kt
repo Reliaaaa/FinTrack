@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material.icons.filled.Menu
@@ -145,8 +146,8 @@ fun FinTrackRoot() {
 
     if (!isOnboarded) {
         OnboardingScreen(
-            onComplete = { name, nickname, initialBalance ->
-                FinTrackRepository.completeOnboarding(name, nickname, initialBalance)
+            onComplete = { name, nickname, email, phone, initialBalance ->
+                FinTrackRepository.completeOnboarding(name, nickname, email, phone, initialBalance)
             }
         )
     } else {
@@ -224,28 +225,268 @@ fun FinTrackApp() {
                     }
                 },
                 actions = {
+                    var showCalendarDialog by remember { mutableStateOf(false) }
+                    val context = LocalContext.current
+
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(DarkNavyCard)
-                            .border(1.dp, DarkNavyBorder, RoundedCornerShape(8.dp))
-                            .clickable {
-                                val curr = FinTrackRepository.getCurrentMonth()
-                                val prev = FinTrackRepository.getPreviousMonth()
-                                val nextPeriod = if (selectedPeriod == curr) prev else curr
-                                FinTrackRepository.setPeriod(nextPeriod)
-                                showToast("Beralih ke periode $nextPeriod")
-                            }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .border(1.dp, PrimaryCobalt.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                            .clickable { showCalendarDialog = true }
+                            .padding(horizontal = 8.dp, vertical = 5.dp)
                     ) {
-                        Text(
-                            text = selectedPeriod,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = SecondaryMint,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarToday,
+                                contentDescription = "Buka Kalender Pengeluaran",
+                                tint = SecondaryMint,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(
+                                text = selectedPeriod,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = SecondaryMint,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                     Spacer(modifier = Modifier.width(8.dp))
+
+                    if (showCalendarDialog) {
+                        val allTx by FinTrackRepository.transactions.collectAsState()
+                        val daysWithTx = remember(allTx) {
+                            allTx.groupBy { it.date }
+                        }
+                        var selectedDateFilter by remember { mutableStateOf(FinTrackRepository.getTodayDate()) }
+
+                        AlertDialog(
+                            onDismissRequest = { showCalendarDialog = false },
+                            containerColor = DarkNavyCardElevated,
+                            title = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    alignItems = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(imageVector = Icons.Default.CalendarToday, contentDescription = null, tint = PrimaryCobalt)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Kalender Finansial",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = TextForeground
+                                        )
+                                    }
+                                }
+                            },
+                            text = {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    Text(
+                                        text = "Pilih tanggal untuk melihat rincian pengeluaran & pemasukan, atau sinkronkan langsung dengan aplikasi Kalender bawaan Android.",
+                                        color = TextMuted,
+                                        fontSize = 12.sp,
+                                        lineHeight = 16.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // Switch Period Buttons (Bulan Ini / Bulan Lalu)
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        val currMonth = FinTrackRepository.getCurrentMonth()
+                                        val prevMonth = FinTrackRepository.getPreviousMonth()
+
+                                        Button(
+                                            onClick = {
+                                                FinTrackRepository.setPeriod(currMonth)
+                                                showToast("Menampilkan transaksi $currMonth")
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = if (selectedPeriod == currMonth) PrimaryCobalt else DarkNavyBackground
+                                            ),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = "Bulan Ini ($currMonth)",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+
+                                        Button(
+                                            onClick = {
+                                                FinTrackRepository.setPeriod(prevMonth)
+                                                showToast("Menampilkan transaksi $prevMonth")
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = if (selectedPeriod == prevMonth) PrimaryCobalt else DarkNavyBackground
+                                            ),
+                                            shape = RoundedCornerShape(8.dp),
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = "Bulan Lalu ($prevMonth)",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // 7 Recent Days selector with indicators
+                                    Text(
+                                        text = "RIWAYAT HARIAN TERAKHIR:",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = TextMuted,
+                                        fontSize = 10.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        FinTrackRepository.getRecentDays().forEach { (dayName, dateStr) ->
+                                            val hasExpense = daysWithTx[dateStr]?.any { it.amount < 0 } == true
+                                            val isSelected = selectedDateFilter == dateStr
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .background(
+                                                        if (isSelected) PrimaryCobalt
+                                                        else DarkNavyBackground
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        if (hasExpense) SecondaryMint.copy(alpha = 0.5f) else Color.Transparent,
+                                                        RoundedCornerShape(8.dp)
+                                                    )
+                                                    .clickable { selectedDateFilter = dateStr }
+                                                    .padding(vertical = 6.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                                    Text(
+                                                        text = dayName,
+                                                        fontSize = 10.sp,
+                                                        color = if (isSelected) Color.White else TextMuted
+                                                    )
+                                                    val dayNum = dateStr.takeLast(2)
+                                                    Text(
+                                                        text = dayNum,
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = if (isSelected) Color.White else TextForeground
+                                                    )
+                                                    if (hasExpense) {
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .size(4.dp)
+                                                                .clip(CircleShape)
+                                                                .background(SecondaryMint)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // Transactions on selected date
+                                    val txsOnDate = daysWithTx[selectedDateFilter] ?: emptyList()
+                                    Text(
+                                        text = "Transaksi Tanggal $selectedDateFilter (${txsOnDate.size}):",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = SecondaryMint,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    if (txsOnDate.isEmpty()) {
+                                        Text(
+                                            text = "Tidak ada riwayat pengeluaran atau pemasukan pada tanggal ini.",
+                                            color = TextMuted,
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(vertical = 8.dp)
+                                        )
+                                    } else {
+                                        txsOnDate.take(3).forEach { tx ->
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 4.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                alignItems = Alignment.CenterVertically
+                                            ) {
+                                                Text(
+                                                    text = tx.name,
+                                                    color = TextForeground,
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                                Text(
+                                                    text = FinTrackRepository.formatRupiah(tx.amount),
+                                                    color = if (tx.amount > 0) SecondaryMint else Color(0xFFFF5252),
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+
+                                    // Button to open Android System Calendar Intent
+                                    OutlinedButton(
+                                        onClick = {
+                                            try {
+                                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                                                    data = android.net.Uri.parse("content://com.android.calendar/time")
+                                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                                }
+                                                context.startActivity(intent)
+                                            } catch (e: Exception) {
+                                                showToast("Gagal membuka kalender Android: Aplikasi kalender tidak terdeteksi")
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.CalendarToday,
+                                            contentDescription = null,
+                                            tint = SecondaryMint,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "Buka di Kalender Android HP",
+                                            color = SecondaryMint,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
+                                }
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = { showCalendarDialog = false },
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryCobalt)
+                                ) {
+                                    Text("Tutup", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = DarkNavyBackground

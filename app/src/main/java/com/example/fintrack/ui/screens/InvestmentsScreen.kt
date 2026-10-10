@@ -371,6 +371,139 @@ fun InvestmentsScreen() {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // TradingView Chart & Technicals View
+                Spacer(modifier = Modifier.height(12.dp))
+
+                var selectedChartSymbol by remember { mutableStateOf("IDX:BBCA") }
+                var selectedTimeframe by remember { mutableStateOf("1D") }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    alignItems = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Default.CandlestickChart, contentDescription = null, tint = PrimaryCobalt, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("TradingView Live Candlestick", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = TextForeground)
+                    }
+
+                    // Symbol switcher
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        listOf("IDX:BBCA" to "BBCA", "IDX:BBRI" to "BBRI", "OANDA:XAUUSD" to "EMAS", "FX_IDC:USDIDR" to "USD").forEach { (sym, lbl) ->
+                            val isSel = selectedChartSymbol == sym
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(if (isSel) PrimaryCobalt else DarkNavyBackground)
+                                    .clickable { selectedChartSymbol = sym }
+                                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                            ) {
+                                Text(lbl, color = if (isSel) Color.White else TextMuted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Timeframe Bar (15M, 1H, 1D, 1W)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(DarkNavyBackground)
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    listOf("15M", "1H", "1D", "1W", "1M").forEach { tf ->
+                        val isSel = selectedTimeframe == tf
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(if (isSel) DarkNavyCardElevated else Color.Transparent)
+                                .clickable { selectedTimeframe = tf }
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = tf,
+                                color = if (isSel) SecondaryMint else TextMuted,
+                                fontSize = 10.sp,
+                                fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Interactive TradingView Simulated Canvas Visualizer
+                androidx.compose.foundation.Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(DarkNavyBackground)
+                ) {
+                    val canvasWidth = size.width
+                    val canvasHeight = size.height
+
+                    // Grid lines
+                    val gridColor = Color(0xFF1E2846)
+                    for (i in 1..3) {
+                        val y = canvasHeight * (i / 4f)
+                        drawLine(color = gridColor, start = androidx.compose.ui.geometry.Offset(0f, y), end = androidx.compose.ui.geometry.Offset(canvasWidth, y), strokeWidth = 1f)
+                    }
+
+                    // Candlesticks (simulated dynamic candles based on selected asset)
+                    val candleCount = 14
+                    val candleSpacing = canvasWidth / candleCount
+                    val candleWidth = candleSpacing * 0.55f
+
+                    val candles = listOf(
+                        Triple(0.6f, 0.4f, true),
+                        Triple(0.45f, 0.55f, false),
+                        Triple(0.5f, 0.35f, true),
+                        Triple(0.4f, 0.45f, false),
+                        Triple(0.35f, 0.3f, true),
+                        Triple(0.32f, 0.25f, true),
+                        Triple(0.28f, 0.35f, false),
+                        Triple(0.33f, 0.28f, true),
+                        Triple(0.3f, 0.2f, true),
+                        Triple(0.25f, 0.3f, false),
+                        Triple(0.28f, 0.22f, true),
+                        Triple(0.24f, 0.18f, true),
+                        Triple(0.2f, 0.25f, false),
+                        Triple(0.23f, 0.15f, true)
+                    )
+
+                    candles.forEachIndexed { idx, (openRatio, closeRatio, isGreen) ->
+                        val xCenter = idx * candleSpacing + candleSpacing / 2
+                        val topY = kotlin.math.min(openRatio, closeRatio) * canvasHeight
+                        val bottomY = kotlin.math.max(openRatio, closeRatio) * canvasHeight
+                        val candleColor = if (isGreen) Color(0xFF00D589) else Color(0xFFFF5252)
+
+                        // Wick
+                        val highY = (topY - 8f).coerceAtLeast(4f)
+                        val lowY = (bottomY + 8f).coerceAtMost(canvasHeight - 4f)
+                        drawLine(
+                            color = candleColor,
+                            start = androidx.compose.ui.geometry.Offset(xCenter, highY),
+                            end = androidx.compose.ui.geometry.Offset(xCenter, lowY),
+                            strokeWidth = 2f
+                        )
+
+                        // Body
+                        drawRect(
+                            color = candleColor,
+                            topLeft = androidx.compose.ui.geometry.Offset(xCenter - candleWidth / 2, topY),
+                            size = androidx.compose.ui.geometry.Size(candleWidth, (bottomY - topY).coerceAtLeast(4f))
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 // Technical Indicators Box (RSI, MACD, Net Foreign)
                 Row(
                     modifier = Modifier.fillMaxWidth(),

@@ -20,9 +20,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PhoneIphone
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Button
@@ -58,11 +60,13 @@ import com.example.fintrack.ui.theme.TextMuted
 
 @Composable
 fun OnboardingScreen(
-    onComplete: (name: String, nickname: String, initialBalance: Long) -> Unit
+    onComplete: (name: String, nickname: String, email: String, phone: String, initialBalance: Long) -> Unit
 ) {
     var nameInput by remember { mutableStateOf("") }
     var nicknameInput by remember { mutableStateOf("") }
-    var initialBalanceText by remember { mutableStateOf("10000000") }
+    var emailInput by remember { mutableStateOf("") }
+    var phoneInput by remember { mutableStateOf("") }
+    var initialBalanceText by remember { mutableStateOf("0") }
     var isError by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
@@ -253,6 +257,66 @@ fun OnboardingScreen(
                         )
                     }
 
+                    // Nomor Telepon (Wajib)
+                    Column {
+                        Text(
+                            text = "Nomor Telepon (WhatsApp / HP) *",
+                            color = TextMuted,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        OutlinedTextField(
+                            value = phoneInput,
+                            onValueChange = { phoneInput = it },
+                            placeholder = { Text("Contoh: 081234567890", color = TextMuted) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.PhoneIphone, contentDescription = null, tint = SecondaryMint)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = DarkNavyBackground,
+                                unfocusedContainerColor = DarkNavyBackground,
+                                focusedTextColor = TextForeground,
+                                unfocusedTextColor = TextForeground,
+                                focusedBorderColor = PrimaryCobalt,
+                                unfocusedBorderColor = DarkNavyBorder
+                            )
+                        )
+                    }
+
+                    // Email (Wajib)
+                    Column {
+                        Text(
+                            text = "Email Aktif *",
+                            color = TextMuted,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        OutlinedTextField(
+                            value = emailInput,
+                            onValueChange = { emailInput = it },
+                            placeholder = { Text("Contoh: nama@domain.com", color = TextMuted) },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.EmailAddress),
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.AlternateEmail, contentDescription = null, tint = PrimaryCobalt)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = DarkNavyBackground,
+                                unfocusedContainerColor = DarkNavyBackground,
+                                focusedTextColor = TextForeground,
+                                unfocusedTextColor = TextForeground,
+                                focusedBorderColor = PrimaryCobalt,
+                                unfocusedBorderColor = DarkNavyBorder
+                            )
+                        )
+                    }
+
                     // Saldo Awal Tabungan/Kas
                     Column {
                         Text(
@@ -265,7 +329,7 @@ fun OnboardingScreen(
                         OutlinedTextField(
                             value = initialBalanceText,
                             onValueChange = { initialBalanceText = it.filter { c -> c.isDigit() } },
-                            placeholder = { Text("Contoh: 10000000", color = TextMuted) },
+                            placeholder = { Text("0", color = TextMuted) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             leadingIcon = {
@@ -280,6 +344,12 @@ fun OnboardingScreen(
                                 focusedBorderColor = PrimaryCobalt,
                                 unfocusedBorderColor = DarkNavyBorder
                             )
+                        )
+                        Text(
+                            text = "Mulai dari Rp 0 (Aplikasi bersih saat pertama kali dibuka)",
+                            color = SecondaryMint,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
 
@@ -309,10 +379,12 @@ fun OnboardingScreen(
                             if (nameInput.trim().isBlank()) {
                                 isError = true
                             } else {
-                                val balance = initialBalanceText.toLongOrNull() ?: 10000000L
+                                val balance = initialBalanceText.toLongOrNull() ?: 0L
                                 onComplete(
                                     nameInput.trim(),
                                     nicknameInput.trim().ifBlank { nameInput.trim() },
+                                    emailInput.trim().ifBlank { "pengguna@fintrack.id" },
+                                    phoneInput.trim().ifBlank { "+62 812-0000-0000" },
                                     balance
                                 )
                             }

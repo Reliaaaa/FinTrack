@@ -34,6 +34,7 @@ class PreferenceManager(context: Context) {
         private const val KEY_USER_NAME = "key_user_name"
         private const val KEY_USER_NICKNAME = "key_user_nickname"
         private const val KEY_USER_EMAIL = "key_user_email"
+        private const val KEY_USER_PHONE = "key_user_phone"
         private const val KEY_CURRENCY = "key_currency"
         private const val KEY_BIOMETRIC_ENABLED = "key_biometric_enabled"
         private const val KEY_TWO_FACTOR_ENABLED = "key_two_factor_enabled"
@@ -56,6 +57,10 @@ class PreferenceManager(context: Context) {
     var userEmail: String
         get() = prefs.getString(KEY_USER_EMAIL, "") ?: ""
         set(value) = prefs.edit().putString(KEY_USER_EMAIL, value).apply()
+
+    var userPhone: String
+        get() = prefs.getString(KEY_USER_PHONE, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_USER_PHONE, value).apply()
 
     var currency: String
         get() = prefs.getString(KEY_CURRENCY, "IDR") ?: "IDR"
