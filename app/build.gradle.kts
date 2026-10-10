@@ -4,6 +4,21 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+val localProps = java.util.Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProps.load(it) }
+}
+val envProps = java.util.Properties()
+val envFile = rootProject.file(".env")
+if (envFile.exists()) {
+    envFile.inputStream().use { envProps.load(it) }
+}
+val geminiApiKey = localProps.getProperty("GEMINI_API_KEY")
+    ?: envProps.getProperty("GEMINI_API_KEY")
+    ?: System.getenv("GEMINI_API_KEY")
+    ?: ""
+
 android {
     namespace = "com.example.fintrack"
     compileSdk = 35
@@ -16,6 +31,8 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     signingConfigs {
@@ -29,7 +46,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -48,6 +66,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -62,5 +81,23 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+
+    // Room Database
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+
+    // Security Crypto for EncryptedSharedPreferences
+    implementation(libs.androidx.security.crypto)
+
+    // WorkManager for Daily 08:45 WIB News Briefing
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Retrofit & Gson for Financial Market Data API
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
+    // Google AI SDK for Gemini AI News Briefing
+    implementation(libs.google.generativeai)
+
     debugImplementation(libs.androidx.ui.tooling)
 }

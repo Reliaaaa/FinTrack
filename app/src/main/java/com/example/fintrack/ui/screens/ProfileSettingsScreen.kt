@@ -27,8 +27,9 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhoneIphone
 import androidx.compose.material.icons.filled.PhonelinkLock
@@ -72,7 +73,9 @@ import com.example.fintrack.ui.theme.TextMuted
 
 @Composable
 fun ProfileSettingsScreen(
-    onShowToast: (String) -> Unit
+    onShowToast: (String) -> Unit,
+    onResetApp: () -> Unit = {},
+    onTriggerGeminiTest: () -> Unit = {}
 ) {
     val userProfile by FinTrackRepository.userProfile.collectAsState()
     val accounts by FinTrackRepository.accounts.collectAsState()
@@ -85,6 +88,7 @@ fun ProfileSettingsScreen(
     var biometricActive by remember { mutableStateOf(userProfile.biometricEnabled) }
     var twoFactorActive by remember { mutableStateOf(userProfile.twoFactorEnabled) }
     var selectedCurrency by remember { mutableStateOf(userProfile.currency) }
+    var showResetDialog by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier
@@ -381,6 +385,42 @@ fun ProfileSettingsScreen(
         }
 
         item {
+            // Section 6: Kecerdasan Buatan (Gemini AI & Notifikasi 08:45 WIB)
+            FinTrackCard {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, tint = PrimaryCobalt, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Kecerdasan Buatan (Gemini AI)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextForeground)
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "FinTrack menjadwalkan ringkasan harian otomatis setiap pukul 08:45 WIB mencakup analisis kebijakan fiskal RI, pergerakan IHSG, dan sentimen geopolitik global.",
+                    color = TextMuted,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = {
+                        onTriggerGeminiTest()
+                        onShowToast("Menjalankan simulasi notifikasi pop-up briefing pasar 08:45 WIB...")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = DarkNavyMuted),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.NotificationsActive, contentDescription = null, tint = SecondaryMint, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Uji Notifikasi Pop-Up Jam 08.45 WIB Sekarang", color = TextForeground, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+
+        item {
             // Save Changes CTA
             Button(
                 onClick = {
@@ -408,7 +448,80 @@ fun ProfileSettingsScreen(
         }
 
         item {
+            // Section 7: Zona Bahaya & Reset Data Lokal
+            FinTrackCard(backgroundColor = DarkNavyCard) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.DeleteForever, contentDescription = null, tint = DangerRed, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Penyimpanan Lokal & Reset Aplikasi", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = DangerRed)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Semua data transaksi, rekening, anggaran, dan preferensi tersimpan di penyimpanan lokal perangkat. Anda dapat mereset aplikasi kapan saja untuk mengisi nama baru dari awal.",
+                    color = TextMuted,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Button(
+                    onClick = { showResetDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = DangerRed.copy(alpha = 0.2f)),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.DeleteForever, contentDescription = null, tint = DangerRed, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Reset Semua Data Aplikasi", color = DangerRed, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        item {
             Spacer(modifier = Modifier.height(80.dp))
         }
+    }
+
+    // Dialog Konfirmasi Reset Aplikasi
+    if (showResetDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            containerColor = DarkNavyCardElevated,
+            title = {
+                Text(
+                    text = "Reset Seluruh Data FinTrack?",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = TextForeground
+                )
+            },
+            text = {
+                Text(
+                    text = "Tindakan ini akan menghapus semua catatan transaksi lokal, rekening, target, dan profil. Anda akan diarahkan kembali ke layar pengisian nama awal (onboarding). Tindakan ini tidak dapat dibatalkan.",
+                    color = TextMuted,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showResetDialog = false
+                        onResetApp()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = DangerRed)
+                ) {
+                    Text("Ya, Hapus & Reset Semua", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.OutlinedButton(onClick = { showResetDialog = false }) {
+                    Text("Batal", color = TextMuted)
+                }
+            }
+        )
     }
 }

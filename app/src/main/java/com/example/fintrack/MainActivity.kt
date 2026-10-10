@@ -77,6 +77,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fintrack.data.model.Account
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import com.example.fintrack.data.model.BudgetConfig
 import com.example.fintrack.data.model.SavingsGoal
 import com.example.fintrack.data.model.SubscriptionItem
@@ -87,6 +93,7 @@ import com.example.fintrack.ui.screens.BudgetScreen
 import com.example.fintrack.ui.screens.GoalsScreen
 import com.example.fintrack.ui.screens.InstantExpenseScreen
 import com.example.fintrack.ui.screens.InvestmentsScreen
+import com.example.fintrack.ui.screens.OnboardingScreen
 import com.example.fintrack.ui.screens.OverviewScreen
 import com.example.fintrack.ui.screens.ProfileSettingsScreen
 import com.example.fintrack.ui.screens.ReceiptScannerScreen
@@ -104,17 +111,46 @@ import com.example.fintrack.ui.theme.PrimaryCobalt
 import com.example.fintrack.ui.theme.SecondaryMint
 import com.example.fintrack.ui.theme.TextForeground
 import com.example.fintrack.ui.theme.TextMuted
+import com.example.fintrack.worker.WorkManagerScheduler
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        FinTrackRepository.init(applicationContext)
+        WorkManagerScheduler.scheduleDailyBriefing(applicationContext)
         setContent {
             FinTrackTheme {
-                FinTrackApp()
+                FinTrackRoot()
             }
         }
+    }
+}
+
+@Composable
+fun FinTrackRoot() {
+    val isOnboarded by FinTrackRepository.isOnboarded.collectAsState()
+
+    // Request notification permission for Android 13+ (POST_NOTIFICATIONS)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { /* Handled */ }
+        )
+        LaunchedEffect(Unit) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    if (!isOnboarded) {
+        OnboardingScreen(
+            onComplete = { name, nickname, initialBalance ->
+                FinTrackRepository.completeOnboarding(name, nickname, initialBalance)
+            }
+        )
+    } else {
+        FinTrackApp()
     }
 }
 
@@ -326,9 +362,19 @@ fun FinTrackApp() {
                     onShowToast = showToast
                 )
                 FinTrackScreen.LOCATIONS -> SpendingLocationsScreen()
-                FinTrackScreen.PROFILE -> ProfileSettingsScreen(
-                    onShowToast = showToast
-                )
+                FinTrackScreen.PROFILE -> {
+                    val context = LocalContext.current
+                    ProfileSettingsScreen(
+                        onShowToast = showToast,
+                        onResetApp = {
+                            FinTrackRepository.resetAllData()
+                            showToast("Semua data berhasil di-reset. Silakan isi nama kembali.")
+                        },
+                        onTriggerGeminiTest = {
+                            WorkManagerScheduler.triggerImmediateNewsBriefing(context)
+                        }
+                    )
+                }
             }
         }
     }

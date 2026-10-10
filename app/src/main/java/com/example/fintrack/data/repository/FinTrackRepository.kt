@@ -1,5 +1,8 @@
 package com.example.fintrack.data.repository
 
+import android.content.Context
+import com.example.fintrack.data.local.AppDatabase
+import com.example.fintrack.data.local.PreferenceManager
 import com.example.fintrack.data.model.Account
 import com.example.fintrack.data.model.BudgetConfig
 import com.example.fintrack.data.model.MarketAsset
@@ -20,6 +23,12 @@ import java.util.Date
 import java.util.Locale
 
 object FinTrackRepository {
+    private var preferenceManager: PreferenceManager? = null
+    private var appDatabase: AppDatabase? = null
+
+    private val _isOnboarded = MutableStateFlow(false)
+    val isOnboarded: StateFlow<Boolean> = _isOnboarded.asStateFlow()
+
     private val localeID = Locale("id", "ID")
     private val numberFormat = NumberFormat.getNumberInstance(localeID)
 
@@ -640,5 +649,53 @@ object FinTrackRepository {
 
     fun updateUserProfile(profile: UserProfile) {
         _userProfile.value = profile
+        preferenceManager?.let { prefs ->
+            prefs.userName = profile.name
+            prefs.userNickname = profile.nickname
+            prefs.userEmail = profile.email
+            prefs.biometricEnabled = profile.biometricEnabled
+            prefs.twoFactorEnabled = profile.twoFactorEnabled
+        }
+    }
+
+    fun init(context: Context) {
+        val prefs = PreferenceManager(context)
+        preferenceManager = prefs
+        appDatabase = AppDatabase.getDatabase(context)
+
+        _isOnboarded.value = prefs.isOnboarded
+        if (prefs.isOnboarded && prefs.userName.isNotBlank()) {
+            _userProfile.value = _userProfile.value.copy(
+                name = prefs.userName,
+                nickname = prefs.userNickname.ifBlank { prefs.userName },
+                currency = prefs.currency,
+                biometricEnabled = prefs.biometricEnabled,
+                twoFactorEnabled = prefs.twoFactorEnabled
+            )
+        }
+    }
+
+    fun completeOnboarding(name: String, nickname: String, initialBalance: Long) {
+        val prefs = preferenceManager
+        if (prefs != null) {
+            prefs.isOnboarded = true
+            prefs.userName = name
+            prefs.userNickname = nickname
+        }
+        _isOnboarded.value = true
+        _userProfile.value = _userProfile.value.copy(
+            name = name,
+            nickname = nickname
+        )
+        // Set the primary account (BCA) to user's initial selected balance
+        _accounts.value = _accounts.value.map {
+            if (it.isPrimary) it.copy(amount = initialBalance) else it
+        }
+    }
+
+    fun resetAllData() {
+        preferenceManager?.resetAllPreferences()
+        _isOnboarded.value = false
+        _userProfile.value = UserProfile(name = "", nickname = "")
     }
 }
