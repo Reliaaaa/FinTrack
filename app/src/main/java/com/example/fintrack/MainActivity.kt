@@ -2,6 +2,7 @@ package com.example.fintrack
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -562,6 +563,10 @@ fun FinTrackApp() {
             }
         }
     ) { innerPadding ->
+        BackHandler(enabled = currentScreen != FinTrackScreen.OVERVIEW) {
+            currentScreen = FinTrackScreen.OVERVIEW
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
