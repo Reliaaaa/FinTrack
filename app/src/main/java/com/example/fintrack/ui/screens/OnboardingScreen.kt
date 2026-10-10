@@ -80,16 +80,16 @@ fun OnboardingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 24.dp, vertical = 36.dp),
+                .padding(horizontal = 20.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Logo Header with Ambient Glow
             Box(
                 modifier = Modifier
-                    .size(96.dp)
+                    .size(72.dp)
                     .clip(CircleShape)
                     .background(
                         Brush.radialGradient(
@@ -103,44 +103,44 @@ fun OnboardingScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(72.dp)
-                        .clip(RoundedCornerShape(20.dp))
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(16.dp))
                         .background(
                             Brush.linearGradient(
                                 colors = listOf(PrimaryCobalt, Color(0xFF3B65E8))
                             )
                         )
-                        .border(2.dp, SecondaryMint.copy(alpha = 0.6f), RoundedCornerShape(20.dp)),
+                        .border(1.5.dp, SecondaryMint.copy(alpha = 0.7f), RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.TrendingUp,
                         contentDescription = "FinTrack Logo",
                         tint = Color.White,
-                        modifier = Modifier.size(38.dp)
+                        modifier = Modifier.size(30.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = "Selamat Datang di FinTrack",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = TextForeground
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = "Asisten Keuangan Cerdas & Portofolio Multi-Aset Pribadi",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = TextMuted,
-                lineHeight = 20.sp
+                lineHeight = 18.sp
             )
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Privacy & Local Storage Badge
             Row(
@@ -166,7 +166,7 @@ fun OnboardingScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Onboarding Form Card
             Box(
