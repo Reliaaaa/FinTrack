@@ -102,161 +102,16 @@ object FinTrackRepository {
 
     private val currentYear = Calendar.getInstance().get(Calendar.YEAR)
 
-    // Complete Accounts List matching HTML Specification (Total: Rp 133.400.000)
-    private val _accounts = MutableStateFlow(
-        listOf(
-            Account(
-                id = "1",
-                name = "BCA Tahapan Prioritas",
-                type = "Bank",
-                amount = 45200000L,
-                accountNumber = "•••• 8821",
-                adminFee = 17000L,
-                interestRate = 0.10,
-                isPrimary = true
-            ),
-            Account(
-                id = "2",
-                name = "Mandiri Tabungan Payroll",
-                type = "Bank",
-                amount = 15000000L,
-                accountNumber = "•••• 4410",
-                adminFee = 12500L,
-                interestRate = 0.08
-            ),
-            Account(
-                id = "3",
-                name = "Bank Jago Digital Saver",
-                type = "Bank",
-                amount = 2200000L,
-                accountNumber = "•••• 1029",
-                adminFee = 0L,
-                interestRate = 2.50
-            ),
-            Account(
-                id = "4",
-                name = "GoPay Tabungan by Jago",
-                type = "E-Wallet",
-                amount = 14750000L,
-                accountNumber = "0812 •••• 9920",
-                adminFee = 0L,
-                interestRate = 3.00
-            ),
-            Account(
-                id = "5",
-                name = "OVO Saldo & Investasi",
-                type = "E-Wallet",
-                amount = 7500000L,
-                accountNumber = "0812 •••• 9920",
-                adminFee = 0L,
-                interestRate = 3.50
-            ),
-            Account(
-                id = "6",
-                name = "Stockbit Sekuritas (RDN BCA)",
-                type = "Sekuritas",
-                amount = 48750000L,
-                accountNumber = "ID Kustodian: XL123456",
-                cashRdn = 6250000L,
-                stockValue = 42500000L
-            )
-        )
-    )
+    // Clean database for fresh usage - users create their own accounts
+    private val _accounts = MutableStateFlow<List<Account>>(emptyList())
     val accounts: StateFlow<List<Account>> = _accounts.asStateFlow()
 
-    // Transactions list
-    private val _transactions = MutableStateFlow(
-        listOf(
-            Transaction(
-                id = 1,
-                name = "PT Teknologi Finansial",
-                category = "Pemasukan",
-                amount = 15000000L,
-                date = getTodayDate(),
-                account = "BCA Utama (•••• 4821)",
-                note = "Gaji Bulanan",
-                type = "income"
-            ),
-            Transaction(
-                id = 2,
-                name = "Supermarket GrandLucky",
-                category = "Makanan & Minuman",
-                amount = -850000L,
-                date = getTodayDate(),
-                account = "BCA Utama (•••• 4821)",
-                note = "Makanan & Bahan Pokok",
-                type = "expense",
-                merchantLocation = "SCBD Sudirman",
-                receiptImageAttached = true,
-                rewardsPoints = 15
-            ),
-            Transaction(
-                id = 3,
-                name = "Tagihan Listrik & WiFi",
-                category = "Tagihan & Utilitas",
-                amount = -450000L,
-                date = getDateOffset(1),
-                account = "BCA Utama (•••• 4821)",
-                note = "Utilitas Rutin Rumah",
-                type = "expense"
-            ),
-            Transaction(
-                id = 4,
-                name = "Grab Car ke Kantor",
-                category = "Transportasi",
-                amount = -70000L,
-                date = getDateOffset(1),
-                account = "GoPay Wallet",
-                note = "Perjalanan Kerja PP",
-                type = "expense"
-            ),
-            Transaction(
-                id = 5,
-                name = "Kopi Kenangan Senopati",
-                category = "Makanan & Minuman",
-                amount = -65000L,
-                date = getDateOffset(2),
-                account = "GoPay Wallet",
-                note = "Kopi Sore Tim",
-                type = "expense",
-                merchantLocation = "Jl. Senopati No. 41"
-            ),
-            Transaction(
-                id = 6,
-                name = "Dividen Saham BBCA",
-                category = "Investasi",
-                amount = 650000L,
-                date = getDateOffset(3),
-                account = "Stockbit Sekuritas",
-                note = "Dividen Tunai Interim",
-                type = "income"
-            ),
-            Transaction(
-                id = 7,
-                name = "IKEA Alam Sutera",
-                category = "Belanja Bulanan",
-                amount = -1250000L,
-                date = getDateOffset(4),
-                account = "BCA Utama (•••• 4821)",
-                note = "Perlengkapan Meja Kerja",
-                type = "expense",
-                receiptImageAttached = true
-            )
-        )
-    )
+    // Clean database for fresh usage - user starts empty
+    private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
     val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow()
 
-    // Monthly Category Budgets (Matching 50/30/20 Formula)
-    private val _budgets = MutableStateFlow(
-        listOf(
-            BudgetConfig(name = "Makanan & Minuman", limit = 3000000L, threshold = 80, recurring = true, month = getCurrentMonth(), categoryGroup = "Kebutuhan"),
-            BudgetConfig(name = "Belanja Bulanan", limit = 2000000L, threshold = 90, recurring = true, month = getCurrentMonth(), categoryGroup = "Kebutuhan"),
-            BudgetConfig(name = "Transportasi", limit = 1500000L, threshold = 80, recurring = true, month = getCurrentMonth(), categoryGroup = "Kebutuhan"),
-            BudgetConfig(name = "Tagihan & Utilitas", limit = 1000000L, threshold = 85, recurring = true, month = getCurrentMonth(), categoryGroup = "Kebutuhan"),
-            BudgetConfig(name = "Hiburan & Rekreasi", limit = 800000L, threshold = 75, recurring = true, month = getCurrentMonth(), categoryGroup = "Keinginan"),
-            BudgetConfig(name = "Investasi & Tabungan", limit = 1700000L, threshold = 80, recurring = true, month = getCurrentMonth(), categoryGroup = "Tabungan")
-        )
-    )
+    // Monthly Category Budgets - clean for user configuration
+    private val _budgets = MutableStateFlow<List<BudgetConfig>>(emptyList())
     val budgets: StateFlow<List<BudgetConfig>> = _budgets.asStateFlow()
 
     // SIM Cards (Dual SIM Setup)
@@ -290,103 +145,12 @@ object FinTrackRepository {
     )
     val simCards: StateFlow<List<SimCardItem>> = _simCards.asStateFlow()
 
-    // Subscriptions List
-    private val _subscriptions = MutableStateFlow(
-        listOf(
-            SubscriptionItem(
-                id = "1",
-                name = "Netflix Premium 4K",
-                cost = 186000L,
-                billingCycle = "Bulanan",
-                nextDueDate = getFutureDate(2),
-                daysLeft = 2,
-                active = true,
-                category = "Hiburan & Streaming",
-                paymentSource = "Jenius Visa (...4819)"
-            ),
-            SubscriptionItem(
-                id = "2",
-                name = "Spotify Family Plan",
-                cost = 86900L,
-                billingCycle = "Bulanan",
-                nextDueDate = getFutureDate(8),
-                daysLeft = 8,
-                active = true,
-                category = "Hiburan & Streaming",
-                paymentSource = "GoPay Wallet"
-            ),
-            SubscriptionItem(
-                id = "3",
-                name = "ChatGPT Plus (OpenAI)",
-                cost = 315000L, // ~$20.00
-                billingCycle = "Bulanan",
-                nextDueDate = getFutureDate(16),
-                daysLeft = 16,
-                active = true,
-                category = "Produktivitas & Kerja",
-                paymentSource = "Mandiri Virtual (...9921)"
-            ),
-            SubscriptionItem(
-                id = "4",
-                name = "Notion AI Workspace",
-                cost = 150000L,
-                billingCycle = "Bulanan",
-                nextDueDate = getFutureDate(6),
-                daysLeft = 6,
-                active = true,
-                category = "Produktivitas & Kerja",
-                paymentSource = "BCA Prioritas"
-            ),
-            SubscriptionItem(
-                id = "5",
-                name = "iCloud+ 200GB (Apple)",
-                cost = 45000L,
-                billingCycle = "Bulanan",
-                nextDueDate = getFutureDate(22),
-                daysLeft = 22,
-                active = true,
-                category = "Hiburan & Streaming",
-                paymentSource = "Apple ID Saldo"
-            )
-        )
-    )
+    // Subscriptions List - clean for user configuration
+    private val _subscriptions = MutableStateFlow<List<SubscriptionItem>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionItem>> = _subscriptions.asStateFlow()
 
-    // Savings Goals
-    private val _savingsGoals = MutableStateFlow(
-        listOf(
-            SavingsGoal(
-                id = "1",
-                title = "MacBook Pro M3 14-inch",
-                targetAmount = 28500000L,
-                currentAmount = 12000000L,
-                deadline = "15 Desember $currentYear",
-                category = "Gadget & Produktivitas",
-                reasonNote = "Investasi kerja freelance dan produktivitas desain UI/UX",
-                iconName = "laptop_mac"
-            ),
-            SavingsGoal(
-                id = "2",
-                title = "Dana Darurat 6 Bulan",
-                targetAmount = 50000000L,
-                currentAmount = 32500000L,
-                deadline = "Desember $currentYear",
-                category = "Keamanan Finansial",
-                reasonNote = "Pondasi ketahanan finansial keluarga",
-                iconName = "shield"
-            ),
-            SavingsGoal(
-                id = "3",
-                title = "Liburan Musim Dingin Jepang",
-                targetAmount = 25000000L,
-                currentAmount = 14200000L,
-                deadline = "Maret ${currentYear + 1}",
-                category = "Liburan",
-                reasonNote = "Trip Tokyo & Kyoto bersama keluarga",
-                iconName = "flight"
-            )
-        )
-    )
+    // Savings Goals - clean for user configuration
+    private val _savingsGoals = MutableStateFlow<List<SavingsGoal>>(emptyList())
     val savingsGoals: StateFlow<List<SavingsGoal>> = _savingsGoals.asStateFlow()
 
     // Commodities, Forex & IDX Stocks
@@ -487,74 +251,12 @@ object FinTrackRepository {
     )
     val marketAssets: StateFlow<List<MarketAsset>> = _marketAssets.asStateFlow()
 
-    // Spending Locations / Geo-Hotspots
-    private val _spendingLocations = MutableStateFlow(
-        listOf(
-            SpendingLocation(
-                id = "1",
-                name = "Grand Lucky Superstore - SCBD",
-                city = "Jakarta Selatan",
-                totalSpent = 1420000L,
-                transactionCount = 3,
-                category = "Supermarket",
-                distance = "1.2 km dari kantor",
-                lastVisited = "Kemarin, 19:42 WIB"
-            ),
-            SpendingLocation(
-                id = "2",
-                name = "Plaza Indonesia Mall Area",
-                city = "Jakarta Pusat",
-                totalSpent = 2450000L,
-                transactionCount = 2,
-                category = "Belanja & Fesyen",
-                distance = "4.5 km dari rumah",
-                lastVisited = "12 Nov, 15:10 WIB"
-            ),
-            SpendingLocation(
-                id = "3",
-                name = "Kopi Kenangan - Senopati",
-                city = "Jakarta Selatan",
-                totalSpent = 180000L,
-                transactionCount = 4,
-                category = "Kafe & Kopi",
-                distance = "800 m dari kantor",
-                lastVisited = "Hari ini, 08:30 WIB"
-            ),
-            SpendingLocation(
-                id = "4",
-                name = "SPBU Pertamina 31.129 Kuningan",
-                city = "Jakarta Selatan",
-                totalSpent = 650000L,
-                transactionCount = 3,
-                category = "Bahan Bakar & Tol",
-                distance = "Mobilitas Rutin",
-                lastVisited = "10 Nov, 07:15 WIB"
-            ),
-            SpendingLocation(
-                id = "5",
-                name = "Sushi Tei - Senayan City",
-                city = "Jakarta Pusat",
-                totalSpent = 770000L,
-                transactionCount = 2,
-                category = "Restoran",
-                distance = "2.1 km",
-                lastVisited = "07 Nov, 20:15 WIB"
-            )
-        )
-    )
+    // Spending Locations / Geo-Hotspots - clean for user transactions
+    private val _spendingLocations = MutableStateFlow<List<SpendingLocation>>(emptyList())
     val spendingLocations: StateFlow<List<SpendingLocation>> = _spendingLocations.asStateFlow()
 
-    // Scanned Receipt Items for OCR Studio
-    private val _receiptItems = MutableStateFlow(
-        listOf(
-            ReceiptItem("1", "Minyak Goreng Sania 2L", "Kebutuhan Pokok", 38000L, 2),
-            ReceiptItem("2", "Daging Sapi Tenderloin 500g", "Lauk Pauk", 185000L, 1),
-            ReceiptItem("3", "Beras Organik Mentik 5kg", "Kebutuhan Pokok", 115000L, 1),
-            ReceiptItem("4", "Susu Segar Greenfields 1L", "Minuman & Dairy", 32000L, 3),
-            ReceiptItem("5", "Aneka Buah Segar Apel & Jeruk", "Buah & Sayur", 128000L, 1),
-            ReceiptItem("6", "Roti Gandum & Keju Slice", "Sarapan", 80000L, 1)
-        )
-    )
+    // Scanned Receipt Items for OCR Studio - clean for user's own receipts
+    private val _receiptItems = MutableStateFlow<List<ReceiptItem>>(emptyList())
     val receiptItems: StateFlow<List<ReceiptItem>> = _receiptItems.asStateFlow()
 
     fun addReceiptItem(item: ReceiptItem) {
@@ -575,14 +277,11 @@ object FinTrackRepository {
     }
 
     fun resetReceiptItems() {
-        _receiptItems.value = listOf(
-            ReceiptItem("1", "Minyak Goreng Sania 2L", "Kebutuhan Pokok", 38000L, 2),
-            ReceiptItem("2", "Daging Sapi Tenderloin 500g", "Lauk Pauk", 185000L, 1),
-            ReceiptItem("3", "Beras Organik Mentik 5kg", "Kebutuhan Pokok", 115000L, 1),
-            ReceiptItem("4", "Susu Segar Greenfields 1L", "Minuman & Dairy", 32000L, 3),
-            ReceiptItem("5", "Aneka Buah Segar Apel & Jeruk", "Buah & Sayur", 128000L, 1),
-            ReceiptItem("6", "Roti Gandum & Keju Slice", "Sarapan", 80000L, 1)
-        )
+        _receiptItems.value = emptyList()
+    }
+
+    fun clearReceiptItems() {
+        _receiptItems.value = emptyList()
     }
 
     fun toggleHideBalance() {
