@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body, #c { margin: 0; height: 100%; background: transparent; }
+</style>
+<script src="lightweight-charts.js"></script>
+</head>
+<body>
+<div id="c"></div>
+<script>
+  const dark = true;
+  const text = dark ? '#C9D6D3' : '#33423F';
+  const gridColor = dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const chart = LightweightCharts.createChart(document.getElementById('c'), {
+    autoSize: true,
+    layout: {
+      background: { type: 'solid', color: 'transparent' },
+      textColor: text,
+      attributionLogo: true
+    },
+    grid: { vertLines: { color: gridColor }, horzLines: { color: gridColor } },
+    rightPriceScale: { borderVisible: false },
+    timeScale: { borderVisible: false },
+    localization: {
+      priceFormatter: function (p) { return 'Rp' + Math.round(p).toLocaleString('id-ID'); }
+    }
+  });
+  const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
+    upColor: '#4EDEA3',
+    downColor: '#FFB3AD',
+    wickUpColor: '#4EDEA3',
+    wickDownColor: '#FFB3AD',
+    borderVisible: false
+  });
+  // rows: [{time: detik epoch, open, high, low, close}] urut naik, tanpa duplikat.
+  window.setCandles = function (rows) {
+    series.setData(rows);
+    chart.timeScale().fitContent();
+  };
+</script>
+</body>
+</html>

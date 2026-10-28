@@ -1,0 +1,5 @@
+tanggal,jenis,jumlah,kategori,catatan,ref
+2026-10-01,INCOME,3000000,GAJI,Uang bulanan,DEMO001
+2026-10-02,EXPENSE,25000,MAKAN,Makan siang,DEMO002
+2026-10-03,EXPENSE,15000,TRANSPORT,Ongkos perjalanan,DEMO003
+2026-10-04,EXPENSE,45000,BELANJA,"Buku, alat tulis",DEMO004
