@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack QA"
+  short_description: "Uji FinTrack dan verifikasi perbaikan bug"
+  default_prompt: "Gunakan $fintrack-qa untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."

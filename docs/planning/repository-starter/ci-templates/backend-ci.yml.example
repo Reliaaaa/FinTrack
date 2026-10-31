@@ -1,0 +1,25 @@
+# Template inactive until backend source, lockfile and test scripts exist.
+name: Backend CI
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Toolchain activation gate
+        run: |
+          echo 'Configure pinned Node runtime, PostgreSQL test service and matching project scripts first.'
+          exit 1
+      - working-directory: services/api
+        run: npm ci
+      - working-directory: services/api
+        run: npm run lint
+      - working-directory: services/api
+        run: npm test
+      - working-directory: services/api
+        run: npm run build

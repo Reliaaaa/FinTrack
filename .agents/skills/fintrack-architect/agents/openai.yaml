@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack Architect"
+  short_description: "Tetapkan arsitektur dan kontrak data FinTrack"
+  default_prompt: "Gunakan $fintrack-architect untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."

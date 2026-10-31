@@ -1,0 +1,23 @@
+# Intentionally inactive and fail-closed until hosting, OIDC and release artifacts are selected.
+name: Deploy staging
+on:
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Deployment activation gate
+        run: |
+          echo 'No deployment configured. Select host and artifact digest; add OIDC, migrations, deploy, health checks and rollback.'
+          exit 1
+# Deploy production must be a separate named workflow with environment production,
+# reviewer gate, trusted commit/tag, tested artifact digest and rollback evidence.

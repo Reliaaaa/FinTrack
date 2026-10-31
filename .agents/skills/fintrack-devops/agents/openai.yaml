@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack DevOps"
+  short_description: "Kelola build, deploy dan komentar GitHub"
+  default_prompt: "Gunakan $fintrack-devops untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."
