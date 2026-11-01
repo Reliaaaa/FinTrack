@@ -17,7 +17,7 @@ Status ketersediaan source diperbarui setelah repository diberikan. Struktur `ap
 
 ## Status skill
 
-Sembilan skill telah dipasang ke folder personal Codex pengguna setelah izin diberikan. Salinan identik disertakan pada paket dan direncanakan pada `.agents/skills/` di branch repository. File terpasang tidak berarti sembilan agent sedang berjalan atau telah melakukan audit/build. Pengenalan skill oleh sesi baru mengikuti pemuatan skill aplikasi.
+Sembilan skill telah dipasang ke folder personal Codex pengguna setelah izin diberikan. Salinan identik disertakan pada paket dan tersedia pada `.agents/skills/` di branch repository. File terpasang tidak berarti sembilan agent sedang berjalan atau telah melakukan audit/build. Pengenalan skill oleh sesi baru mengikuti pemuatan skill aplikasi.
 
 ## Batas validasi
 
@@ -34,6 +34,8 @@ Review draft PR planning, pilih tiket M0 yang belum terpenuhi, reproduksi baseli
 
 ## Status penyerahan ke GitHub
 
-Branch lokal `planning/fintrack-team-skills-20261031` telah disiapkan di atas master `aaa94566182b167918f87789f2ef9e830ebc393b`. Paket menambah 39 file dan tidak menimpa file baseline. Konektor menolak create-tree dengan HTTP 403 “Resource not accessible by integration”. Push melalui Git lokal juga gagal karena credential helper Windows tidak dapat berjalan. **Belum ada branch remote, PR, atau run Actions baru yang berhasil dibuat.**
+Diperbarui 1 November 2026. Branch `planning/fintrack-team-skills-20261031` berhasil dipublikasikan melalui GitHub Desktop. [Draft PR #1](https://github.com/Reliaaaa/FinTrack/pull/1) menuju master telah dibuat; belum di-merge. Paket menambah 39 file tanpa menimpa file baseline.
 
-Overlay repository dan patch disertakan agar hasil tetap dapat diterapkan. Publikasi berikutnya memerlukan koneksi GitHub yang memiliki akses menulis isi repository dan workflow, atau akses Git lokal yang berfungsi. Periksa master terbaru sebelum menerapkan patch dan jangan force-push cabang yang sudah berubah.
+Commit paket awal: `63c96ab07eb47a50f4a1d7c30b27764bc7646a02`, berbasis master `aaa94566182b167918f87789f2ef9e830ebc393b`. Planning validation untuk commit tersebut lulus pada [push](https://github.com/Reliaaaa/FinTrack/actions/runs/41303944523) dan [pull request](https://github.com/Reliaaaa/FinTrack/actions/runs/41304225682). Keduanya memvalidasi paket planning, bukan build aplikasi. Status commit berikutnya dapat dilihat pada tab Checks PR.
+
+Kendala akses tulis konektor/Git CLI sebelumnya teratasi untuk publikasi ini melalui GitHub Desktop. Notifier belum aktif karena belum berada di default branch. Tidak ada build APK, deployment, atau audit keamanan aplikasi yang dijalankan. Overlay dan patch tetap disediakan untuk arsip; jangan diterapkan ulang pada branch yang sudah memuat paket.
