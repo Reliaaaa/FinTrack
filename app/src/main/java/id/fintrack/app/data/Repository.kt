@@ -19,6 +19,7 @@ class Repository(private val db: AppDatabase) {
     }
 
     val budgets = dao.budgets()
+    val billPayments = dao.billPayments()
     val goals = dao.goals()
 
     val accounts = dao.accounts()
@@ -218,6 +219,26 @@ class Repository(private val db: AppDatabase) {
             }
             dao.insertBillPayment(BillPaymentEntity(id, period, txId, if (existingTransactionId == null) "CREATED" else "LINKED"))
             dao.updateObligation(o.copy(lastPaidMonth=period, remaining=if (o.remaining > 0) o.remaining - 1 else o.remaining))
+        }
+    }
+
+    suspend fun cancelBillPayment(id: Long, period: String, expectedTransactionId: Long, deleteExpense: Boolean) {
+        db.withTransaction {
+            val payment = dao.billPayment(id, period) ?: return@withTransaction
+            require(payment.transactionId == expectedTransactionId) { "Pembayaran berubah. Buka ulang konfirmasi." }
+            require(payment.origin != "LEGACY_MARKER") { "Penanda historis memerlukan rekonsiliasi manual" }
+            val o = requireNotNull(dao.obligation(id))
+            require(o.lastPaidMonth == period) { "Batalkan pembayaran terbaru terlebih dahulu" }
+            if (deleteExpense) {
+                require(payment.origin == "CREATED") { "Pengeluaran yang dikaitkan harus tetap disimpan" }
+                val tx = requireNotNull(dao.transaction(expectedTransactionId))
+                require(tx.type == TxType.EXPENSE.name && tx.status == TxStatus.CONFIRMED && tx.transferGroup == null)
+                adjustBalance(requireNotNull(tx.accountId), tx.amount)
+                dao.deleteTransaction(tx.id)
+            }
+            dao.deleteBillPayment(id, period)
+            dao.updateObligation(o.copy(lastPaidMonth=dao.latestPaidPeriod(id),
+                remaining=if (o.remaining >= 0) Math.addExact(o.remaining, 1) else o.remaining))
         }
     }
 

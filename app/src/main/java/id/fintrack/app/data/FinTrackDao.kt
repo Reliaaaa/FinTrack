@@ -9,6 +9,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FinTrackDao {
+    @Query("SELECT * FROM bill_payments")
+    fun billPayments(): Flow<List<BillPaymentEntity>>
+    @Query("DELETE FROM bill_payments WHERE obligationId = :id AND period = :period")
+    suspend fun deleteBillPayment(id: Long, period: String)
+    @Query("SELECT MAX(period) FROM bill_payments WHERE obligationId = :id")
+    suspend fun latestPaidPeriod(id: Long): String?
     @Query("SELECT * FROM bill_payments WHERE obligationId = :id AND period = :period")
     suspend fun billPayment(id: Long, period: String): BillPaymentEntity?
     @Query("SELECT COUNT(*) FROM bill_payments WHERE transactionId = :id")

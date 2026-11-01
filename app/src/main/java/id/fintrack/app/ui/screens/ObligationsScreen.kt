@@ -47,6 +47,8 @@ import java.util.Locale
 @Composable
 fun ObligationsScreen(vm: MainViewModel) {
     val state by vm.obligations.collectAsStateWithLifecycle()
+    val payments by vm.billPayments.collectAsStateWithLifecycle()
+    var cancelPayment by remember { mutableStateOf<id.fintrack.app.data.BillPaymentEntity?>(null) }
     var markId by remember { mutableStateOf<Long?>(null) }
     var deleteId by remember { mutableStateOf<Long?>(null) }
     var showAdd by remember { mutableStateOf(false) }
@@ -95,6 +97,13 @@ fun ObligationsScreen(vm: MainViewModel) {
                             }
                         }
                         LabeledValue(kind.label, Money.format(o.amount))
+                        payments.firstOrNull { it.obligationId == o.id && it.period == o.lastPaidMonth }?.let { payment ->
+                            if (payment.transactionId != null) {
+                                TextButton(onClick={cancelPayment=payment}) { Text("Batalkan catatan pembayaran ${payment.period}") }
+                            } else {
+                                Text("Penanda lunas historis; belum terkait transaksi.")
+                            }
+                        }
                         LabeledValue("Jatuh tempo berikutnya", fmtDate(row.nextDue))
                         if (o.remaining >= 0) LabeledValue("Sisa pembayaran", "${o.remaining} kali")
                         if (row.paidThisMonth) {
@@ -110,6 +119,21 @@ fun ObligationsScreen(vm: MainViewModel) {
         }
     }
 
+    cancelPayment?.let { payment ->
+        var deleteExpense by remember(payment) { mutableStateOf(false) }
+        FormDialog(title="Batalkan catatan pembayaran ${payment.period}?", confirmLabel="Konfirmasi pembatalan",
+            confirmEnabled=true, onDismiss={cancelPayment=null}, onConfirm={
+                payment.transactionId?.let { vm.cancelBillPayment(payment.obligationId, payment.period, it, deleteExpense) }
+                cancelPayment=null
+            }) {
+            Text("Status kembali belum lunas dan sisa cicilan dipulihkan. Ini hanya koreksi catatan.")
+            if(payment.origin == "CREATED") {
+                DropdownField("Pengeluaran", listOf(false,true), deleteExpense,
+                    { if(it) "Hapus dan pulihkan saldo" else "Pertahankan pengeluaran" }) { deleteExpense=it }
+            }
+            Text(if(deleteExpense) "Pengeluaran dihapus; nominalnya dikembalikan ke saldo rekening." else "Kaitan dilepas. Pengeluaran dan saldo tetap; jangan catat pengeluaran kedua saat mengaitkannya kembali.")
+        }
+    }
     markId?.let { id ->
         val accounts by vm.accounts.collectAsStateWithLifecycle()
         val transactions by vm.transactions.collectAsStateWithLifecycle()
@@ -125,7 +149,7 @@ fun ObligationsScreen(vm: MainViewModel) {
                 vm.payBill(id, period, if(mode == "Baru") accountId else null, if(mode == "Kaitkan") txId else null)
                 markId=null
             }) {
-            Text("${bill?.name.orEmpty()} — ${Money.format(bill?.amount ?: 0L)}")
+            Text("${bill?.name.orEmpty()} â€” ${Money.format(bill?.amount ?: 0L)}")
             DropdownField("Cara pencatatan", listOf("Baru", "Kaitkan"), mode, { it }) { mode=it }
             if(mode == "Baru") {
                 Text("Membuat pengeluaran dan mengurangi saldo rekening. Tidak mengirim uang.")

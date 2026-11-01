@@ -19,6 +19,33 @@ class LedgerTest {
         repo=Repository(db)
     }
     @After fun close() { db.close() }
+    @Test fun cancellationRefundsOnceAndRestoresInstallment() = runBlocking {
+        val account = db.dao().insertAccount(AccountEntity(name="Bank",type="BANK",balance=1000))
+        val bill = db.dao().insertObligation(ObligationEntity(name="Bill",kind="CICILAN",amount=100,dueDay=1,remaining=1))
+        val period = java.time.YearMonth.now().toString()
+        repo.payBill(bill,period,account)
+        val tx = db.dao().billPayment(bill,period)!!.transactionId!!
+        repo.cancelBillPayment(bill,period,tx,true)
+        repo.cancelBillPayment(bill,period,tx,true)
+        assertEquals(1000L,db.dao().account(account)!!.balance)
+        assertEquals(1,db.dao().obligation(bill)!!.remaining)
+        assertNull(db.dao().obligation(bill)!!.lastPaidMonth)
+        assertTrue(db.dao().transactionsOnce().isEmpty())
+    }
+    @Test fun unlinkPreservesExpenseAndRejectsStaleCancellationAfterNewPayment() = runBlocking {
+        val account = db.dao().insertAccount(AccountEntity(name="Bank",type="BANK",balance=1000))
+        val bill = db.dao().insertObligation(ObligationEntity(name="Bill",kind="CICILAN",amount=100,dueDay=1,remaining=2))
+        val period = java.time.YearMonth.now().toString()
+        repo.payBill(bill,period,account)
+        val tx = db.dao().billPayment(bill,period)!!.transactionId!!
+        repo.cancelBillPayment(bill,period,tx,false)
+        assertEquals(900L,db.dao().account(account)!!.balance)
+        assertNotNull(db.dao().transaction(tx))
+        assertEquals(2,db.dao().obligation(bill)!!.remaining)
+        repo.payBill(bill,period,account)
+        assertTrue(runCatching { repo.cancelBillPayment(bill,period,tx,true) }.isFailure)
+        assertEquals(800L,db.dao().account(account)!!.balance)
+    }
     @Test fun billPaymentRetryDebitsOnce() = runBlocking {
         val account = db.dao().insertAccount(AccountEntity(name="Bank",type="BANK",balance=1000))
         val bill = db.dao().insertObligation(ObligationEntity(name="Tagihan",kind="CICILAN",amount=100,dueDay=1,remaining=3))

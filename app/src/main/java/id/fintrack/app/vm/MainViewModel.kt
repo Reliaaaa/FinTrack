@@ -51,6 +51,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val settings: StateFlow<Settings> = settingsFlow
 
     val budgets = repo.budgets.stateIn(viewModelScope, keepAlive, emptyList())
+    val billPayments = repo.billPayments.stateIn(viewModelScope, keepAlive, emptyList())
     val goals = repo.goals.stateIn(viewModelScope, keepAlive, emptyList())
     val accounts = repo.accounts.stateIn(viewModelScope, keepAlive, emptyList())
     val transactions = repo.transactions.stateIn(viewModelScope, keepAlive, emptyList())
@@ -215,6 +216,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun deleteObligation(id: Long) {
         mutate { repo.deleteObligation(id) }
+    }
+
+    fun cancelBillPayment(id: Long, period: String, transactionId: Long, deleteExpense: Boolean) {
+        mutate { repo.cancelBillPayment(id, period, transactionId, deleteExpense) }
     }
 
     // Aset
