@@ -1,6 +1,7 @@
 package id.fintrack.app.data
 
 import androidx.room.withTransaction
+import id.fintrack.app.domain.LedgerBalance
 import id.fintrack.app.domain.Category
 import id.fintrack.app.domain.ParsedTx
 import id.fintrack.app.domain.TxType
@@ -10,6 +11,12 @@ import java.time.format.DateTimeFormatter
 
 class Repository(private val db: AppDatabase) {
     private val dao = db.dao()
+
+    // All callers must remain inside db.withTransaction: read, check and write are atomic.
+    private suspend fun adjustBalance(id: Long, delta: Long) {
+        val account = requireNotNull(dao.account(id)) { "Rekening tidak ditemukan" }
+        dao.setBalance(id, LedgerBalance.apply(account.balance, delta))
+    }
 
     val budgets = dao.budgets()
     val goals = dao.goals()
@@ -60,7 +67,7 @@ class Repository(private val db: AppDatabase) {
                     status = TxStatus.CONFIRMED
                 )
             )
-            dao.adjustBalance(accountId, signed(type.name, amount))
+            adjustBalance(accountId, signed(type.name, amount))
         }
     }
 
@@ -70,10 +77,10 @@ class Repository(private val db: AppDatabase) {
             val old = requireNotNull(dao.transaction(id))
             require(old.status == TxStatus.CONFIRMED && old.transferGroup == null)
             requireNotNull(dao.account(accountId))
-            old.accountId?.let { dao.adjustBalance(it, -signed(old.type, old.amount)) }
+            old.accountId?.let { adjustBalance(it, -signed(old.type, old.amount)) }
             dao.updateTransaction(old.copy(accountId=accountId,type=type.name,amount=amount,
                 category=category.name,note=note.trim(),timestamp=timestamp))
-            dao.adjustBalance(accountId,signed(type.name,amount))
+            adjustBalance(accountId,signed(type.name,amount))
         }
     }
 
@@ -83,14 +90,14 @@ class Repository(private val db: AppDatabase) {
             if (tx != null) {
                 if (tx.transferGroup != null) {
                     for (row in dao.transferRows(tx.transferGroup)) {
-                        row.accountId?.let { dao.adjustBalance(it, if (row.type == "TRANSFER_IN") -row.amount else row.amount) }
+                        row.accountId?.let { adjustBalance(it, if (row.type == "TRANSFER_IN") -row.amount else row.amount) }
                         dao.deleteTransaction(row.id)
                     }
                     return@withTransaction
                 }
                 val acc = tx.accountId
                 if (tx.status == TxStatus.CONFIRMED && acc != null) {
-                    dao.adjustBalance(acc, -signed(tx.type, tx.amount))
+                    adjustBalance(acc, -signed(tx.type, tx.amount))
                 }
                 dao.deleteTransaction(id)
             }
@@ -122,7 +129,7 @@ class Repository(private val db: AppDatabase) {
             if (tx != null && tx.status == TxStatus.DRAFT) {
                 requireNotNull(dao.account(accountId)) { "Rekening tidak ditemukan" }
                 dao.updateTransaction(tx.copy(accountId = accountId, category = category.name, status = TxStatus.CONFIRMED))
-                dao.adjustBalance(accountId, signed(tx.type, tx.amount))
+                adjustBalance(accountId, signed(tx.type, tx.amount))
             }
         }
     }
@@ -145,8 +152,8 @@ class Repository(private val db: AppDatabase) {
                     category=Category.LAINNYA.name, note=note, timestamp=now, source=TxSource.MANUAL,
                     status=TxStatus.CONFIRMED, transferGroup=group))
             }
-            dao.adjustBalance(from, -amount)
-            dao.adjustBalance(to, amount)
+            adjustBalance(from, -amount)
+            adjustBalance(to, amount)
         }
     }
     suspend fun saveBudget(category: String, amount: Long) {
@@ -169,7 +176,7 @@ class Repository(private val db: AppDatabase) {
                 val id = dao.insertTransaction(TransactionEntity(accountId=accountId,type=r.type.name,
                     amount=r.amount,category=r.category.name,note=r.note,timestamp=r.timestamp(),
                     source="CSV",status=TxStatus.CONFIRMED,fingerprint=r.fingerprint(accountId)))
-                if (id != -1L) { dao.adjustBalance(accountId,signed(r.type.name,r.amount));inserted++ }
+                if (id != -1L) { adjustBalance(accountId,signed(r.type.name,r.amount));inserted++ }
             }
         }
         return inserted

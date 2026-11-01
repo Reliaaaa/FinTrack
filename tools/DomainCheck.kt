@@ -14,6 +14,12 @@ private fun <T> eq(name: String, actual: T, expected: T) {
 }
 
 fun main() {
+    eq("saldo pemasukan", LedgerBalance.apply(100, 50), 150L)
+    eq("saldo negatif tetap didukung", LedgerBalance.apply(100, -150), -50L)
+    eq("saldo batas atas", LedgerBalance.apply(Long.MAX_VALUE - 1, 1), Long.MAX_VALUE)
+    eq("saldo batas bawah", LedgerBalance.apply(Long.MIN_VALUE + 1, -1), Long.MIN_VALUE)
+    eq("saldo overflow ditolak", runCatching { LedgerBalance.apply(Long.MAX_VALUE, 1) }.isFailure, true)
+    eq("saldo underflow ditolak", runCatching { LedgerBalance.apply(Long.MIN_VALUE, -1) }.isFailure, true)
     // Money.format
     eq("format 1250000", Money.format(1_250_000), "Rp1.250.000")
     eq("format negatif", Money.format(-5_000), "-Rp5.000")

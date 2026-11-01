@@ -39,8 +39,8 @@ interface FinTrackDao {
     @Insert
     suspend fun insertAccount(account: AccountEntity): Long
 
-    @Query("UPDATE accounts SET balance = balance + :delta WHERE id = :id")
-    suspend fun adjustBalance(id: Long, delta: Long)
+    @Query("UPDATE accounts SET balance = :balance WHERE id = :id")
+    suspend fun setBalance(id: Long, balance: Long)
 
     @Query("DELETE FROM accounts WHERE id = :id")
     suspend fun deleteAccount(id: Long)

@@ -19,6 +19,20 @@ class LedgerTest {
         repo=Repository(db)
     }
     @After fun close() { db.close() }
+    @Test fun overflowingIncomeRollsBackInsertedTransaction() = runBlocking {
+        val id = db.dao().insertAccount(AccountEntity(name="Limit",type="BANK",balance=Long.MAX_VALUE))
+        assertTrue(runCatching { repo.addTransaction(id,TxType.INCOME,1,Category.GAJI,"Overflow") }.isFailure)
+        assertEquals(Long.MAX_VALUE,db.dao().account(id)!!.balance)
+        assertTrue(db.dao().transactionsOnce().isEmpty())
+    }
+    @Test fun overflowingTransferRollsBackBothAccountsAndRows() = runBlocking {
+        val from = db.dao().insertAccount(AccountEntity(name="Source",type="BANK",balance=10))
+        val to = db.dao().insertAccount(AccountEntity(name="Limit",type="BANK",balance=Long.MAX_VALUE))
+        assertTrue(runCatching { repo.transfer(from,to,1) }.isFailure)
+        assertEquals(10L,db.dao().account(from)!!.balance)
+        assertEquals(Long.MAX_VALUE,db.dao().account(to)!!.balance)
+        assertTrue(db.dao().transactionsOnce().isEmpty())
+    }
     @Test fun editAcrossAccountsAndDeleteRestoresBalances() = runBlocking {
         repo.addAccount("Bank","BANK",1_000_000,true);repo.addAccount("Wallet","DOMPET",200_000,true)
         val a=db.dao().accountsOnce()
