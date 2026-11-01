@@ -100,7 +100,7 @@ fun ObligationsScreen(vm: MainViewModel) {
                         if (row.paidThisMonth) {
                             Text("Lunas bulan ini", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                         } else if (o.remaining != 0) {
-                            TextButton(onClick = { markId=o.id }) { Text("Tandai lunas bulan ini") }
+                            TextButton(onClick = { markId=o.id }) { Text("Catat pembayaran") }
                         } else {
                             Text("Selesai", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                         }
@@ -110,7 +110,33 @@ fun ObligationsScreen(vm: MainViewModel) {
         }
     }
 
-    markId?.let { id -> AlertDialog(onDismissRequest={markId=null},title={Text("Sudah mencatat pembayaran?")},text={Text("Tandai lunas hanya memperbarui status tagihan. Catat pengeluarannya di Transaksi terlebih dahulu agar saldo rekening tetap benar.")},confirmButton={TextButton(onClick={vm.markPaid(id);markId=null}){Text("Sudah, tandai lunas")}},dismissButton={TextButton(onClick={markId=null}){Text("Batal")}}) }
+    markId?.let { id ->
+        val accounts by vm.accounts.collectAsStateWithLifecycle()
+        val transactions by vm.transactions.collectAsStateWithLifecycle()
+        val period = remember(id) { java.time.YearMonth.now().toString() }
+        var accountId by remember(id) { mutableStateOf<Long?>(null) }
+        var txId by remember(id) { mutableStateOf<Long?>(null) }
+        var mode by remember(id) { mutableStateOf("Baru") }
+        val bill = state.rows.firstOrNull { it.entity.id == id }?.entity
+        val candidates = transactions.filter { it.type == "EXPENSE" && it.transferGroup == null && it.amount == bill?.amount }
+        FormDialog(title="Catat pembayaran $period", confirmLabel="Konfirmasi",
+            confirmEnabled=if(mode == "Baru") accountId != null else txId != null,
+            onDismiss={markId=null}, onConfirm={
+                vm.payBill(id, period, if(mode == "Baru") accountId else null, if(mode == "Kaitkan") txId else null)
+                markId=null
+            }) {
+            Text("${bill?.name.orEmpty()} — ${Money.format(bill?.amount ?: 0L)}")
+            DropdownField("Cara pencatatan", listOf("Baru", "Kaitkan"), mode, { it }) { mode=it }
+            if(mode == "Baru") {
+                Text("Membuat pengeluaran dan mengurangi saldo rekening. Tidak mengirim uang.")
+                DropdownField("Rekening", accounts, accounts.firstOrNull { it.id == accountId }, { it.name }) { accountId=it.id }
+            } else {
+                Text("Pilih pengeluaran yang sudah dicatat. Saldo tidak dikurangi lagi.")
+                DropdownField("Transaksi", candidates, candidates.firstOrNull { it.id == txId },
+                    { "#${it.id} ${it.note} (${java.time.Instant.ofEpochMilli(it.timestamp).atZone(java.time.ZoneId.systemDefault()).toLocalDate()})" }) { txId=it.id }
+            }
+        }
+    }
     deleteId?.let { id -> AlertDialog(onDismissRequest={deleteId=null},title={Text("Hapus jadwal tagihan?")},text={Text("Tagihan tidak lagi dicadangkan dalam proyeksi. Riwayat transaksi tetap tersimpan.")},confirmButton={TextButton(onClick={vm.deleteObligation(id);deleteId=null}){Text("Hapus")}},dismissButton={TextButton(onClick={deleteId=null}){Text("Batal")}}) }
     if (showAdd) {
         AddObligationDialog(

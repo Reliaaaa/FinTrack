@@ -209,8 +209,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         mutate { repo.addObligation(name, kind.name, amount, dueDay, remaining) }
     }
 
-    fun markPaid(id: Long) {
-        mutate { repo.markPaid(id, YearMonth.now().toString()) }
+    fun payBill(id: Long, period: String, accountId: Long?, existingTransactionId: Long?) {
+        mutate { repo.payBill(id, period, accountId, existingTransactionId) }
     }
 
     fun deleteObligation(id: Long) {

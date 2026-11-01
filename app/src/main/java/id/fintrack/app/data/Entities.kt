@@ -73,3 +73,9 @@ data class BudgetEntity(@PrimaryKey val category: String, val amount: Long)
 @Entity(tableName = "goals")
 data class GoalEntity(@PrimaryKey(autoGenerate = true) val id: Long = 0,
  val name: String, val target: Long, val saved: Long, val dueDate: String)
+
+/** A null transactionId preserves a v1 marker without inventing a debit. */
+@Entity(tableName = "bill_payments", primaryKeys = ["obligationId", "period"],
+    indices = [Index(value = ["transactionId"], unique = true)])
+data class BillPaymentEntity(val obligationId: Long, val period: String,
+    val transactionId: Long?, val origin: String)

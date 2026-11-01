@@ -9,6 +9,16 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FinTrackDao {
+    @Query("SELECT * FROM bill_payments WHERE obligationId = :id AND period = :period")
+    suspend fun billPayment(id: Long, period: String): BillPaymentEntity?
+    @Query("SELECT COUNT(*) FROM bill_payments WHERE transactionId = :id")
+    suspend fun paymentLinks(id: Long): Int
+    @Query("SELECT COUNT(*) FROM bill_payments WHERE obligationId = :id")
+    suspend fun obligationPayments(id: Long): Int
+    @Insert
+    suspend fun insertBillPayment(payment: BillPaymentEntity)
+    @Query("DELETE FROM bill_payments")
+    suspend fun clearBillPayments()
     @Query("SELECT * FROM budgets ORDER BY category")
     fun budgets(): Flow<List<BudgetEntity>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)

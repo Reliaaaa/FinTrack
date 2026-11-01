@@ -19,6 +19,42 @@ class LedgerTest {
         repo=Repository(db)
     }
     @After fun close() { db.close() }
+    @Test fun billPaymentRetryDebitsOnce() = runBlocking {
+        val account = db.dao().insertAccount(AccountEntity(name="Bank",type="BANK",balance=1000))
+        val bill = db.dao().insertObligation(ObligationEntity(name="Tagihan",kind="CICILAN",amount=100,dueDay=1,remaining=3))
+        val period = java.time.YearMonth.now().toString()
+        repo.payBill(bill,period,account)
+        repo.payBill(bill,period,account)
+        assertEquals(900L,db.dao().account(account)!!.balance)
+        assertEquals(1,db.dao().transactionsOnce().size)
+        assertEquals(2,db.dao().obligation(bill)!!.remaining)
+        val tx = db.dao().transactionsOnce().single()
+        assertTrue(runCatching { repo.deleteTransaction(tx.id) }.isFailure)
+        assertTrue(runCatching { repo.deleteObligation(bill) }.isFailure)
+    }
+    @Test fun linkingExistingExpenseDoesNotDebitAgain() = runBlocking {
+        val account = db.dao().insertAccount(AccountEntity(name="Bank",type="BANK",balance=1000))
+        repo.addTransaction(account,TxType.EXPENSE,100,Category.LAINNYA,"Sudah dibayar")
+        val tx = db.dao().transactionsOnce().single().id
+        val bill = db.dao().insertObligation(ObligationEntity(name="Tagihan",kind="CICILAN",amount=100,dueDay=1,remaining=3))
+        val period = java.time.YearMonth.now().toString()
+        repo.payBill(bill,period,null,tx)
+        assertEquals(900L,db.dao().account(account)!!.balance)
+        assertEquals(1,db.dao().transactionsOnce().size)
+        val other = db.dao().insertObligation(ObligationEntity(name="Lain",kind="CICILAN",amount=100,dueDay=1,remaining=3))
+        assertTrue(runCatching { repo.payBill(other,period,null,tx) }.isFailure)
+        assertNull(db.dao().billPayment(other,period))
+    }
+    @Test fun failedBillDebitRollsBackReceiptAndSchedule() = runBlocking {
+        val account = db.dao().insertAccount(AccountEntity(name="Limit",type="BANK",balance=Long.MIN_VALUE))
+        val bill = db.dao().insertObligation(ObligationEntity(name="Tagihan",kind="CICILAN",amount=100,dueDay=1,remaining=3))
+        val period = java.time.YearMonth.now().toString()
+        assertTrue(runCatching { repo.payBill(bill,period,account) }.isFailure)
+        assertEquals(Long.MIN_VALUE,db.dao().account(account)!!.balance)
+        assertEquals(3,db.dao().obligation(bill)!!.remaining)
+        assertNull(db.dao().billPayment(bill,period))
+        assertTrue(db.dao().transactionsOnce().isEmpty())
+    }
     @Test fun overflowingIncomeRollsBackInsertedTransaction() = runBlocking {
         val id = db.dao().insertAccount(AccountEntity(name="Limit",type="BANK",balance=Long.MAX_VALUE))
         assertTrue(runCatching { repo.addTransaction(id,TxType.INCOME,1,Category.GAJI,"Overflow") }.isFailure)

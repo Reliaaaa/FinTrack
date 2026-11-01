@@ -5,10 +5,11 @@ import androidx.room.Room
 import id.fintrack.app.data.AppDatabase
 import id.fintrack.app.data.Prefs
 import id.fintrack.app.data.Repository
+import id.fintrack.app.data.MIGRATION_1_2
 
 class FinTrackApplication : Application() {
     val database: AppDatabase by lazy {
-        Room.databaseBuilder(this, AppDatabase::class.java, "fintrack.db").build()
+        Room.databaseBuilder(this, AppDatabase::class.java, "fintrack.db").addMigrations(MIGRATION_1_2).build()
     }
     val repository: Repository by lazy { Repository(database) }
     val prefs: Prefs by lazy { Prefs(this) }

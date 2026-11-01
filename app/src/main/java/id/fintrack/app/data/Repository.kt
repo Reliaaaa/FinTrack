@@ -74,6 +74,7 @@ class Repository(private val db: AppDatabase) {
     suspend fun editTransaction(id: Long, accountId: Long, type: TxType, amount: Long, category: Category, note: String, timestamp: Long) {
         require(amount in 1..1_000_000_000_000_000L)
         db.withTransaction {
+            require(dao.paymentLinks(id) == 0) { "Transaksi terkait tagihan belum dapat diedit" }
             val old = requireNotNull(dao.transaction(id))
             require(old.status == TxStatus.CONFIRMED && old.transferGroup == null)
             requireNotNull(dao.account(accountId))
@@ -86,6 +87,7 @@ class Repository(private val db: AppDatabase) {
 
     suspend fun deleteTransaction(id: Long) {
         db.withTransaction {
+            require(dao.paymentLinks(id) == 0) { "Transaksi terkait tagihan belum dapat dihapus" }
             val tx = dao.transaction(id)
             if (tx != null) {
                 if (tx.transferGroup != null) {
@@ -189,18 +191,40 @@ class Repository(private val db: AppDatabase) {
         )
     }
 
-    /** Tandai lunas untuk bulan yyyy-MM. Mengurangi sisa bayar bila ada batas. */
-    suspend fun markPaid(id: Long, yearMonth: String) {
+    /** One receipt per bill/month; debit and schedule update commit together. */
+    suspend fun payBill(id: Long, period: String, accountId: Long?, existingTransactionId: Long? = null) {
+        java.time.YearMonth.parse(period)
         db.withTransaction {
-            val o = dao.obligation(id)
-            if (o != null && o.lastPaidMonth != yearMonth) {
-                val remaining = if (o.remaining > 0) o.remaining - 1 else o.remaining
-                dao.updateObligation(o.copy(lastPaidMonth = yearMonth, remaining = remaining))
+            if (dao.billPayment(id, period) != null) return@withTransaction
+            require(period == java.time.YearMonth.now().toString()) { "Buka ulang pembayaran untuk bulan berjalan" }
+            val o = requireNotNull(dao.obligation(id)) { "Tagihan tidak ditemukan" }
+            require(o.lastPaidMonth != period) { "Tagihan sudah ditandai lunas" }
+            require(o.remaining != 0 && o.amount in 1..1_000_000_000_000_000L)
+            val txId = if (existingTransactionId != null) {
+                val tx = requireNotNull(dao.transaction(existingTransactionId))
+                require(tx.status == TxStatus.CONFIRMED && tx.type == TxType.EXPENSE.name && tx.transferGroup == null)
+                require(tx.amount == o.amount && tx.accountId != null && dao.account(tx.accountId) != null)
+                require(dao.paymentLinks(tx.id) == 0) { "Transaksi sudah terkait tagihan" }
+                tx.id
+            } else {
+                val account = requireNotNull(accountId) { "Pilih rekening" }
+                requireNotNull(dao.account(account))
+                val newId = dao.insertTransaction(TransactionEntity(accountId=account, type=TxType.EXPENSE.name,
+                    amount=o.amount, category=Category.LAINNYA.name, note="Tagihan: ${o.name} ($period)",
+                    timestamp=System.currentTimeMillis(), source="BILL", status=TxStatus.CONFIRMED))
+                require(newId != -1L)
+                adjustBalance(account, -o.amount)
+                newId
             }
+            dao.insertBillPayment(BillPaymentEntity(id, period, txId, if (existingTransactionId == null) "CREATED" else "LINKED"))
+            dao.updateObligation(o.copy(lastPaidMonth=period, remaining=if (o.remaining > 0) o.remaining - 1 else o.remaining))
         }
     }
 
-    suspend fun deleteObligation(id: Long) = dao.deleteObligation(id)
+    suspend fun deleteObligation(id: Long) = db.withTransaction {
+        require(dao.obligationPayments(id) == 0) { "Jadwal memiliki riwayat pembayaran dan belum dapat dihapus" }
+        dao.deleteObligation(id)
+    }
 
     // Aset
     suspend fun addHolding(name: String, assetClass: String, symbol: String?, quantity: Double, costBasis: Long, unitPrice: Long) {
@@ -269,6 +293,7 @@ class Repository(private val db: AppDatabase) {
 
     suspend fun wipe() {
         db.withTransaction {
+            dao.clearBillPayments()
             dao.clearTransactions()
             dao.clearAccounts()
             dao.clearObligations()
