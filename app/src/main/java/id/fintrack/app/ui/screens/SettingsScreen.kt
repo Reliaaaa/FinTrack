@@ -42,6 +42,8 @@ import id.fintrack.app.ui.IntField
 import id.fintrack.app.ui.LabeledValue
 import id.fintrack.app.ui.ScreenScaffold
 import id.fintrack.app.ui.SectionTitle
+import id.fintrack.app.ui.OperationConfirm
+import id.fintrack.app.ui.rememberOperation
 import id.fintrack.app.vm.MainViewModel
 import java.time.LocalDate
 
@@ -58,6 +60,9 @@ fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
     var income by remember(s.monthlyIncome) { mutableStateOf(if (s.monthlyIncome > 0) s.monthlyIncome.toString() else "") }
     var access by remember { mutableStateOf(listenerEnabled(context)) }
     var confirmWipe by remember { mutableStateOf(false) }
+    val saveOperation = rememberOperation(vm, "saveSettings") {}
+    val notificationOperation = rememberOperation(vm, "setNotifCapture") {}
+    val exportOperation = rememberOperation(vm, "exportTo") {}
 
     // Pengguna kembali dari layar akses notifikasi sistem. Baca ulang statusnya.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { access = listenerEnabled(context) }
@@ -75,14 +80,15 @@ fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             SectionTitle("Gajian")
-            IntField("Tanggal gajian (1 sampai 31)", day) { day = it }
-            AmountField("Pemasukan bulanan", income) { income = it }
+            IntField("Tanggal gajian (1 sampai 31)", day) { if (!saveOperation.saving) day = it }
+            AmountField("Pemasukan bulanan", income) { if (!saveOperation.saving) income = it }
             Button(
                 onClick = { vm.saveSettings(dayValue ?: s.incomeDay, income.toLongOrNull() ?: 0L) },
-                enabled = dayValid
-            ) { Text("Simpan") }
+                enabled = dayValid && !saveOperation.saving && !saveOperation.saved
+            ) { Text(if(saveOperation.saving) "Menyimpan..." else "Simpan") }
+            saveOperation.error?.let { Text(it, color=MaterialTheme.colorScheme.error) }
             if (!dayValid && day.isNotEmpty()) {
-                Text("Tanggal hfintrack antara 1 dan 31.", color = MaterialTheme.colorScheme.error)
+                Text("Tanggal harus antara 1 dan 31.", color = MaterialTheme.colorScheme.error)
             }
 
             SectionTitle("Notifikasi bank dan dompet")
@@ -98,8 +104,9 @@ fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Tangkap notifikasi", fontWeight = FontWeight.SemiBold)
-                    Switch(checked = s.notifCapture, onCheckedChange = { vm.setNotifCapture(it) })
+                    Switch(checked = s.notifCapture, enabled = !notificationOperation.saving && !notificationOperation.saved, onCheckedChange = { vm.setNotifCapture(it) })
                 }
+                notificationOperation.error?.let { Text(it, color=MaterialTheme.colorScheme.error) }
                 LabeledValue("Akses notifikasi sistem", if (access) "Aktif" else "Belum diberikan")
                 if (!access) {
                     Text(
@@ -114,9 +121,10 @@ fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
             }
 
             SectionTitle("Data")
-            OutlinedButton(onClick = { exporter.launch("fintrack-transaksi-${LocalDate.now()}.csv") }) {
-                Text("Ekspor transaksi (CSV)")
+            OutlinedButton(enabled = !exportOperation.saving && !exportOperation.saved, onClick = { exporter.launch("fintrack-transaksi-${LocalDate.now()}.csv") }) {
+                Text(if(exportOperation.saving) "Mengekspor..." else "Ekspor transaksi (CSV)")
             }
+            exportOperation.error?.let { Text(it, color=MaterialTheme.colorScheme.error) }
             OutlinedButton(
                 onClick = { confirmWipe = true },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
@@ -141,17 +149,8 @@ fun SettingsScreen(vm: MainViewModel, onBack: () -> Unit) {
     }
 
     if (confirmWipe) {
-        AlertDialog(
-            onDismissRequest = { confirmWipe = false },
-            title = { Text("Hapus semua data?") },
-            text = { Text("Rekening, transaksi, kewajiban, dan aset dihapus dari perangkat ini. Tindakan ini tidak bisa dibatalkan.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    vm.wipeAll()
-                    confirmWipe = false
-                }) { Text("Hapus", color = MaterialTheme.colorScheme.error) }
-            },
-            dismissButton = { TextButton(onClick = { confirmWipe = false }) { Text("Batal") } }
-        )
+        OperationConfirm(vm, "wipeAll", "Hapus semua data?",
+            "Rekening, transaksi, kewajiban, dan aset dihapus dari perangkat ini. Tindakan ini tidak bisa dibatalkan.",
+            { confirmWipe=false }, { vm.wipeAll() })
     }
 }

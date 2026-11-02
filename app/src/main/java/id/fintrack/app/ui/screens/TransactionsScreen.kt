@@ -48,6 +48,9 @@ import id.fintrack.app.ui.AmountField
 import id.fintrack.app.ui.FinTrackCard
 import id.fintrack.app.ui.DropdownField
 import id.fintrack.app.ui.EmptyNote
+import id.fintrack.app.ui.OperationConfirm
+import id.fintrack.app.ui.OperationButton
+import id.fintrack.app.ui.OperationForm
 import id.fintrack.app.ui.FormDialog
 import id.fintrack.app.ui.SectionTitle
 import id.fintrack.app.ui.TextInput
@@ -109,7 +112,7 @@ fun TransactionsScreen(vm: MainViewModel, openAdd: Boolean = false, onAddOpened:
                         )
                         Row {
                             TextButton(onClick = { confirming = d }) { Text("Konfirmasi") }
-                            TextButton(onClick = { vm.discardDraft(d.id) }) { Text("Buang") }
+                            OperationButton(vm, "discardDraft:${d.id}", "Buang") { vm.discardDraft(d.id) }
                         }
                     }
                 }
@@ -151,17 +154,18 @@ fun TransactionsScreen(vm: MainViewModel, openAdd: Boolean = false, onAddOpened:
             }
         )
     }
-    deleting?.let { t -> AlertDialog(onDismissRequest={deleting=null},title={Text("Hapus transaksi?")},text={Text(if(t.transferGroup!=null) "Kedua sisi transfer dihapus dan kedua saldo dikembalikan." else "Saldo rekening dikembalikan sesuai transaksi ini.")},confirmButton={TextButton(onClick={vm.deleteTransaction(t);deleting=null}){Text("Hapus")}},dismissButton={TextButton(onClick={deleting=null}){Text("Batal")}}) }
+    deleting?.let { t -> OperationConfirm(vm, "deleteTransaction", "Hapus transaksi?", if(t.transferGroup!=null) "Kedua sisi transfer dihapus dan kedua saldo dikembalikan." else "Saldo rekening dikembalikan sesuai transaksi ini.", { deleting=null }, { vm.deleteTransaction(t) }) }
     confirming?.let { d ->
+        OperationForm(vm, "confirmDraft", onSaved = { confirming=null }) {
         ConfirmDraftDialog(
             draft = d,
             accounts = accounts,
             onDismiss = { confirming = null },
             onConfirm = { acc, category ->
                 vm.confirmDraft(d.id, acc, category)
-                confirming = null
             }
         )
+        }
     }
 }
 

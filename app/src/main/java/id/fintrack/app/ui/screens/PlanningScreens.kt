@@ -51,11 +51,13 @@ import java.time.YearMonth
             }
         }
     }
-    if(add) FormDialog("Atur Batas Anggaran",confirmEnabled=(amount.toLongOrNull()?:0)>0,onDismiss={add=false},onConfirm={vm.saveBudget(category.name,amount.toLong());add=false}) {
+    if(add) OperationForm(vm, "saveBudget", onSaved = { add=false }) {
+        FormDialog("Atur Batas Anggaran",confirmEnabled=(amount.toLongOrNull()?:0)>0,onDismiss={add=false},onConfirm={vm.saveBudget(category.name,amount.toLong())}) {
         DropdownField("Kategori",Category.values().filter { it!=Category.GAJI },category,{it.label}){category=it}
         AmountField("Batas per bulan",amount){amount=it}
     }
-    removing?.let { c -> AlertDialog(onDismissRequest={removing=null},title={Text("Hapus batas anggaran?")},text={Text("Riwayat transaksi tetap tersimpan.")},confirmButton={TextButton(onClick={vm.deleteBudget(c);removing=null}){Text("Hapus")}},dismissButton={TextButton(onClick={removing=null}){Text("Batal")}}) }
+        }
+    removing?.let { c -> OperationConfirm(vm, "deleteBudget", "Hapus batas anggaran?", "Riwayat transaksi tetap tersimpan.", { removing=null }, { vm.deleteBudget(c) }) }
 }
 
 @Composable fun GoalsScreen(vm: MainViewModel, onBack: () -> Unit) {
@@ -85,15 +87,17 @@ import java.time.YearMonth
         var date by remember(existing) { mutableStateOf(existing?.dueDate?:LocalDate.now().plusMonths(6).toString()) }
         val parsed=runCatching { LocalDate.parse(date) }.getOrNull()
         val t=target.toLongOrNull()?:0L;val v=saved.toLongOrNull()?:-1L
-        FormDialog("Target Tabungan",confirmEnabled=name.isNotBlank()&&t>0&&v in 0..t&&parsed!=null,onDismiss={adding=false;editing=null},onConfirm={vm.saveGoal(GoalEntity(existing?.id?:0,name,t,v,date));adding=false;editing=null}) {
+        OperationForm(vm, "saveGoal", onSaved = { adding=false;editing=null }) {
+        FormDialog("Target Tabungan",confirmEnabled=name.isNotBlank()&&t>0&&v in 0..t&&parsed!=null,onDismiss={adding=false;editing=null},onConfirm={vm.saveGoal(GoalEntity(existing?.id?:0,name,t,v,date))}) {
             TextInput("Nama target",name){name=it}
             AmountField("Jumlah target",target){target=it}
             AmountField("Sudah terkumpul",saved){saved=it}
             TextInput("Tanggal target YYYY-MM-DD",date){date=it}
             if(parsed==null) Text("Gunakan tanggal valid, contoh 2027-06-30.",color=MaterialTheme.colorScheme.error)
         }
+        }
     }
-    removing?.let { g -> AlertDialog(onDismissRequest={removing=null},title={Text("Hapus target ${g.name}?")},confirmButton={TextButton(onClick={vm.deleteGoal(g.id);removing=null}){Text("Hapus")}},dismissButton={TextButton(onClick={removing=null}){Text("Batal")}}) }
+    removing?.let { g -> OperationConfirm(vm, "deleteGoal", "Hapus target ${g.name}?", "Catatan target dihapus. Saldo rekening tetap.", { removing=null }, { vm.deleteGoal(g.id) }) }
 }
 
 @Composable fun ForecastScreen(vm: MainViewModel,onBack: () -> Unit) {
@@ -148,14 +152,16 @@ import java.time.YearMonth
     val accounts by vm.accounts.collectAsStateWithLifecycle()
     var from by rememberSaveable { mutableStateOf<Long?>(null) };var to by rememberSaveable { mutableStateOf<Long?>(null) }
     var amount by rememberSaveable { mutableStateOf("") }
+    val operation = rememberOperation(vm, "transfer") { amount="" }
     val source=accounts.firstOrNull { it.id==from };val target=accounts.firstOrNull { it.id==to }
     val value=amount.toLongOrNull()?:0L
     ScreenScaffold("Transfer Antar Rekening",onBack) { pad ->
         LazyColumn(Modifier.padding(pad),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
             item { FinTrackCard { Text("Catat perpindahan dana",style=MaterialTheme.typography.titleLarge);Text("Pencatatan ini mengubah dua saldo di FinTrack. Transfer uang sebenarnya dilakukan melalui aplikasi bank atau dompetmu.") } }
-            item { DropdownField("Sumber",accounts,source,{it.name}){from=it.id};DropdownField("Tujuan",accounts.filter { it.id!=from },target,{it.name}){to=it.id};AmountField("Nominal transfer",amount){amount=it} }
+            item { DropdownField("Sumber",accounts,source,{it.name}){if (!operation.saving) from=it.id};DropdownField("Tujuan",accounts.filter { it.id!=from },target,{it.name}){if (!operation.saving) to=it.id};AmountField("Nominal transfer",amount){if (!operation.saving) amount=it} }
             item { source?.let { LabeledValue("Saldo sumber",Money.format(it.balance)) };if(value>(source?.balance?:0)) Text("Saldo sumber tidak cukup.",color=MaterialTheme.colorScheme.error) }
-            item { Button(onClick={vm.transfer(requireNotNull(from),requireNotNull(to),value);amount=""},enabled=source!=null&&target!=null&&from!=to&&value>0&&value<=source.balance){Text("Catat transfer")} }
+            item { Button(onClick={vm.transfer(requireNotNull(from),requireNotNull(to),value)},enabled=!operation.saving && !operation.saved && source!=null&&target!=null&&from!=to&&value>0&&value<=source.balance){Text(if(operation.saving) "Menyimpan..." else "Catat transfer")}
+                operation.error?.let { Text(it, color=MaterialTheme.colorScheme.error) } }
             item { Text("Transfer tidak masuk ke total pemasukan atau pengeluaran. Menghapus salah satu sisi transfer juga mengembalikan kedua saldo.",style=MaterialTheme.typography.bodySmall) }
         }
     }

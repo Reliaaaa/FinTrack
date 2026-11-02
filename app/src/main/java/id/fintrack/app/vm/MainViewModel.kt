@@ -127,23 +127,21 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val message: StateFlow<String?> = messageFlow
     fun consumeMessage() { messageFlow.value = null }
 
-    private fun mutate(block: suspend () -> Unit) {
-        viewModelScope.launch {
-            try { block(); messageFlow.value = "Tersimpan" }
-            catch (e: CancellationException) { throw e }
-            catch (e: Exception) { messageFlow.value = e.message ?: "Gagal menyimpan" }
-        }
-    }
-    fun transfer(from: Long, to: Long, amount: Long) = mutate { repo.transfer(from, to, amount) }
-    fun saveBudget(category: String, amount: Long) = mutate { repo.saveBudget(category, amount) }
-    fun deleteBudget(category: String) = mutate { repo.deleteBudget(category) }
-    fun saveGoal(g: GoalEntity) = mutate { repo.saveGoal(g) }
-    fun deleteGoal(id: Long) = mutate { repo.deleteGoal(id) }
+    fun transfer(from: Long, to: Long, amount: Long) = operations.submit("transfer") { repo.transfer(from, to, amount) }
+    fun saveBudget(category: String, amount: Long) = operations.submit("saveBudget") { repo.saveBudget(category, amount) }
+    fun deleteBudget(category: String) = operations.submit("deleteBudget") { repo.deleteBudget(category) }
+    fun saveGoal(g: GoalEntity) = operations.submit("saveGoal") { repo.saveGoal(g) }
+    fun deleteGoal(id: Long) = operations.submit("deleteGoal") { repo.deleteGoal(id) }
     private val importPreviewFlow = MutableStateFlow<List<id.fintrack.app.domain.ImportRow>>(emptyList())
     val importPreview: StateFlow<List<id.fintrack.app.domain.ImportRow>> = importPreviewFlow
     private val importStatusFlow = MutableStateFlow("")
     val importStatus: StateFlow<String> = importStatusFlow
+    private val importBusyFlow = MutableStateFlow(false)
+    val importBusy: StateFlow<Boolean> = importBusyFlow
     fun readImport(uri: Uri) {
+        if (importBusyFlow.value) return
+        operations.reset("commitImport")
+        importBusyFlow.value = true
         importPreviewFlow.value = emptyList()
         viewModelScope.launch {
             importStatusFlow.value = "Membaca CSV..."
@@ -167,28 +165,34 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 importStatusFlow.value = "${rows.size} baris siap ditinjau"
             } catch(e: CancellationException) { throw e }
             catch(e: Exception) { importStatusFlow.value = e.message ?: "CSV tidak dapat dibaca" }
+            finally { importBusyFlow.value = false }
         }
     }
     fun commitImport(accountId: Long) {
+        if (importBusyFlow.value || operations.state("commitImport").value.saved) return
         val rows = importPreviewFlow.value
-        if(rows.isEmpty()) return
-        importPreviewFlow.value = emptyList()
-        viewModelScope.launch {
+        if (rows.isEmpty()) return
+        importBusyFlow.value = true
+        operations.submit("commitImport") {
             try {
-                val n=repo.importRows(accountId,rows)
-                importStatusFlow.value="$n transaksi ditambahkan, ${rows.size-n} duplikat dilewati"
-            } catch(e: CancellationException) { throw e }
-            catch(e: Exception) { importStatusFlow.value=e.message ?: "Impor gagal" }
+                val n = repo.importRows(accountId, rows)
+                importPreviewFlow.value = emptyList()
+                importStatusFlow.value = "$n transaksi ditambahkan, ${rows.size-n} duplikat dilewati"
+            } finally {
+                importBusyFlow.value = false
+            }
         }
     }
     // Rekening
     fun addAccount(name: String, type: String, balance: Long, liquid: Boolean) {
-        mutate { repo.addAccount(name, type, balance, liquid) }
+        operations.submit("addAccount") { repo.addAccount(name, type, balance, liquid) }
     }
 
     fun deleteAccount(id: Long) {
-        mutate { repo.deleteAccount(id) }
+        operations.submit("deleteAccount") { repo.deleteAccount(id) }
     }
+
+    val operations = OperationStore(viewModelScope)
 
     // Transaksi
     private val transactionSaveFlow = MutableStateFlow(TransactionSaveState())
@@ -225,45 +229,45 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun deleteTransaction(tx: TransactionEntity) {
-        mutate { repo.deleteTransaction(tx.id) }
+        operations.submit("deleteTransaction") { repo.deleteTransaction(tx.id) }
     }
 
     fun confirmDraft(id: Long, accountId: Long, category: Category) {
-        mutate { repo.confirmDraft(id, accountId, category) }
+        operations.submit("confirmDraft") { repo.confirmDraft(id, accountId, category) }
     }
 
     fun discardDraft(id: Long) {
-        mutate { repo.discardDraft(id) }
+        operations.submit("discardDraft:$id") { repo.discardDraft(id) }
     }
 
     // Kewajiban
     fun addObligation(name: String, kind: ObligationKind, amount: Long, dueDay: Int, remaining: Int) {
-        mutate { repo.addObligation(name, kind.name, amount, dueDay, remaining) }
+        operations.submit("addObligation") { repo.addObligation(name, kind.name, amount, dueDay, remaining) }
     }
 
     fun payBill(id: Long, period: String, accountId: Long?, existingTransactionId: Long?) {
-        mutate { repo.payBill(id, period, accountId, existingTransactionId) }
+        operations.submit("payBill") { repo.payBill(id, period, accountId, existingTransactionId) }
     }
 
     fun deleteObligation(id: Long) {
-        mutate { repo.deleteObligation(id) }
+        operations.submit("deleteObligation") { repo.deleteObligation(id) }
     }
 
     fun cancelBillPayment(id: Long, period: String, transactionId: Long, deleteExpense: Boolean) {
-        mutate { repo.cancelBillPayment(id, period, transactionId, deleteExpense) }
+        operations.submit("cancelBillPayment") { repo.cancelBillPayment(id, period, transactionId, deleteExpense) }
     }
 
     // Aset
     fun addHolding(name: String, assetClass: AssetClass, symbol: String?, quantity: Double, costBasis: Long, unitPrice: Long) {
-        mutate { repo.addHolding(name, assetClass.name, symbol, quantity, costBasis, unitPrice) }
+        operations.submit("addHolding") { repo.addHolding(name, assetClass.name, symbol, quantity, costBasis, unitPrice) }
     }
 
     fun setHoldingPrice(id: Long, price: Long) {
-        mutate { repo.setHoldingPrice(id, price) }
+        operations.submit("setHoldingPrice") { repo.setHoldingPrice(id, price) }
     }
 
     fun deleteHolding(h: HoldingEntity) {
-        mutate { repo.deleteHolding(h.id) }
+        operations.submit("deleteHolding") { repo.deleteHolding(h.id) }
     }
 
     // Harga dan grafik
@@ -309,37 +313,32 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     // Pengaturan
-    fun saveSettings(incomeDay: Int, monthlyIncome: Long) {
+    fun saveSettings(incomeDay: Int, monthlyIncome: Long) = operations.submit("saveSettings") {
         prefs.incomeDay = incomeDay
         prefs.monthlyIncome = monthlyIncome
         settingsFlow.value = prefs.snapshot()
+        messageFlow.value = "Pengaturan tersimpan"
     }
 
-    fun setNotifCapture(on: Boolean) {
+    fun setNotifCapture(on: Boolean) = operations.submit("setNotifCapture") {
         prefs.notifCapture = on
         settingsFlow.value = prefs.snapshot()
     }
 
     fun exportTo(uri: Uri) {
-        viewModelScope.launch {
-            messageFlow.value = try {
+        operations.submit("exportTo") {
                 val csv = repo.exportCsv()
                 withContext(Dispatchers.IO) {
                     val out = getApplication<Application>().contentResolver.openOutputStream(uri)
                         ?: throw IllegalStateException("file tujuan tidak bisa ditulis")
                     out.use { it.write(csv.toByteArray(Charsets.UTF_8)) }
                 }
-                "Ekspor selesai"
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                "Ekspor gagal: ${e.message ?: "kesalahan tidak dikenal"}"
-            }
+                messageFlow.value = "Ekspor selesai"
         }
     }
 
     fun wipeAll() {
-        mutate {
+        operations.submit("wipeAll") {
             repo.wipe()
             messageFlow.value = "Semua data dihapus"
         }

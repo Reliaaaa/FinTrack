@@ -172,12 +172,20 @@ fun FormDialog(
     dismissEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val operation = LocalOperationState.current
+    val canDismiss = dismissEnabled && !operation.saving
     AlertDialog(
-        onDismissRequest = { if (dismissEnabled) onDismiss() },
+        onDismissRequest = { if (canDismiss) onDismiss() },
         title = { Text(title) },
-        text = { Column(Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp), content = content) },
-        confirmButton = { TextButton(onClick = onConfirm, enabled = confirmEnabled) { Text(confirmLabel) } },
-        dismissButton = { TextButton(onClick = onDismiss, enabled = dismissEnabled) { Text("Batal") } }
+        text = {
+            Column(Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                operation.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                if (operation.saving) Text("Sedang menyimpan. Mohon tunggu.")
+                else content()
+            }
+        },
+        confirmButton = { TextButton(onClick = onConfirm, enabled = confirmEnabled && !operation.saving && !operation.saved) { Text(if (operation.saving) "Menyimpan..." else confirmLabel) } },
+        dismissButton = { TextButton(onClick = onDismiss, enabled = canDismiss) { Text("Batal") } }
     )
 }
 

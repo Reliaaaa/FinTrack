@@ -43,6 +43,9 @@ import id.fintrack.app.ui.FinTrackCard
 import id.fintrack.app.ui.DecimalField
 import id.fintrack.app.ui.DropdownField
 import id.fintrack.app.ui.EmptyNote
+import id.fintrack.app.ui.OperationConfirm
+import id.fintrack.app.ui.OperationButton
+import id.fintrack.app.ui.OperationForm
 import id.fintrack.app.ui.FormDialog
 import id.fintrack.app.ui.LabeledValue
 import id.fintrack.app.ui.PriceChart
@@ -131,32 +134,35 @@ fun AssetsScreen(vm: MainViewModel) {
         item { OutlinedButton(onClick = { showHolding = true }) { Text("Tambah aset") } }
     }
 
-    deletingAccount?.let { id -> AlertDialog(onDismissRequest={deletingAccount=null},title={Text("Hapus rekening?")},text={Text("Hanya rekening tanpa riwayat transaksi yang dapat dihapus.")},confirmButton={TextButton(onClick={vm.deleteAccount(id);deletingAccount=null}){Text("Hapus")}},dismissButton={TextButton(onClick={deletingAccount=null}){Text("Batal")}}) }
-    deletingHolding?.let { h -> AlertDialog(onDismissRequest={deletingHolding=null},title={Text("Hapus aset ${h.name}?")},text={Text("Ini menghapus catatan portofolio tanpa menjual aset sebenarnya.")},confirmButton={TextButton(onClick={vm.deleteHolding(h);deletingHolding=null}){Text("Hapus")}},dismissButton={TextButton(onClick={deletingHolding=null}){Text("Batal")}}) }
+    deletingAccount?.let { id -> OperationConfirm(vm, "deleteAccount", "Hapus rekening?", "Hanya rekening tanpa riwayat transaksi yang dapat dihapus.", { deletingAccount=null }, { vm.deleteAccount(id) }) }
+    deletingHolding?.let { h -> OperationConfirm(vm, "deleteHolding", "Hapus aset ${h.name}?", "Ini menghapus catatan portofolio tanpa menjual aset sebenarnya.", { deletingHolding=null }, { vm.deleteHolding(h) }) }
     if (showAccount) {
+        OperationForm(vm, "addAccount", onSaved = { showAccount = false }) {
         AddAccountDialog(onDismiss = { showAccount = false }) { name, type, balance, liquid ->
             vm.addAccount(name, type.name, balance, liquid)
-            showAccount = false
+        }
         }
     }
     if (showHolding) {
+        OperationForm(vm, "addHolding", onSaved = { showHolding = false }) {
         AddHoldingDialog(onDismiss = { showHolding = false }) { name, cls, symbol, qty, cost, price ->
             vm.addHolding(name, cls, symbol, qty, cost, price)
-            showHolding = false
+        }
         }
     }
     pricing?.let { h ->
         var price by remember(h.id) { mutableStateOf(h.unitPrice.toString()) }
+        OperationForm(vm, "setHoldingPrice", onSaved = { pricing = null }) {
         FormDialog(
             title = "Harga ${h.name}",
             confirmEnabled = (price.toLongOrNull() ?: 0L) > 0,
             onDismiss = { pricing = null },
             onConfirm = {
                 vm.setHoldingPrice(h.id, price.toLongOrNull() ?: h.unitPrice)
-                pricing = null
             }
         ) {
             AmountField("Harga per ${AssetClass.fromName(h.assetClass).unit}", price) { price = it }
+        }
         }
     }
     charting?.let { h ->

@@ -19,3 +19,19 @@ try: db.execute("INSERT INTO bill_payments VALUES(2,'2026-11',123,'LINKED')")
 except sqlite3.IntegrityError: pass
 else: raise AssertionError('duplicate transaction accepted')
 print('PASS: v1 schema migration, legacy marker, no debit, unchanged remaining, unique period and transaction')
+
+# Compare the migrated structure with Room's actual v2 export, not a handwritten expectation.
+v2=json.loads((root/'app/schemas/id.fintrack.app.data.AppDatabase/2.json').read_text(encoding='utf-8'))['database']
+expected=sqlite3.connect(':memory:')
+for entity in v2['entities']:
+ table=entity['tableName']
+ expected.execute(entity['createSql'].replace('${TABLE_NAME}',table))
+ for index in entity['indices']:
+  expected.execute(index['createSql'].replace('${TABLE_NAME}',table))
+ assert db.execute(f'PRAGMA table_info("{table}")').fetchall()==expected.execute(f'PRAGMA table_info("{table}")').fetchall(),table
+ assert db.execute(f'PRAGMA foreign_key_list("{table}")').fetchall()==expected.execute(f'PRAGMA foreign_key_list("{table}")').fetchall(),table
+ assert sorted(db.execute(f'PRAGMA index_list("{table}")').fetchall())==sorted(expected.execute(f'PRAGMA index_list("{table}")').fetchall()),table
+ for index in entity['indices']:
+  name=index['name']
+  assert db.execute(f'PRAGMA index_info("{name}")').fetchall()==expected.execute(f'PRAGMA index_info("{name}")').fetchall(),name
+print('PASS: migrated columns, primary keys, foreign keys and indexes match Room schema v2')

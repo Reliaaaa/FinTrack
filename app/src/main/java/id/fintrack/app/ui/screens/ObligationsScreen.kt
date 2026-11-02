@@ -38,6 +38,9 @@ import id.fintrack.app.ui.AmountField
 import id.fintrack.app.ui.FinTrackCard
 import id.fintrack.app.ui.DropdownField
 import id.fintrack.app.ui.EmptyNote
+import id.fintrack.app.ui.OperationConfirm
+import id.fintrack.app.ui.OperationButton
+import id.fintrack.app.ui.OperationForm
 import id.fintrack.app.ui.FormDialog
 import id.fintrack.app.ui.IntField
 import id.fintrack.app.ui.LabeledValue
@@ -125,10 +128,10 @@ fun ObligationsScreen(vm: MainViewModel, onBack: () -> Unit) {
 
     cancelPayment?.let { payment ->
         var deleteExpense by remember(payment) { mutableStateOf(false) }
+        OperationForm(vm, "cancelBillPayment", onSaved = { cancelPayment=null }) {
         FormDialog(title="Batalkan catatan pembayaran ${payment.period}?", confirmLabel="Konfirmasi pembatalan",
             confirmEnabled=true, onDismiss={cancelPayment=null}, onConfirm={
                 payment.transactionId?.let { vm.cancelBillPayment(payment.obligationId, payment.period, it, deleteExpense) }
-                cancelPayment=null
             }) {
             Text("Status kembali belum lunas dan sisa cicilan dipulihkan. Ini hanya koreksi catatan.")
             if(payment.origin == "CREATED") {
@@ -136,6 +139,7 @@ fun ObligationsScreen(vm: MainViewModel, onBack: () -> Unit) {
                     { if(it) "Hapus dan pulihkan saldo" else "Pertahankan pengeluaran" }) { deleteExpense=it }
             }
             Text(if(deleteExpense) "Pengeluaran dihapus; nominalnya dikembalikan ke saldo rekening." else "Kaitan dilepas. Pengeluaran dan saldo tetap; jangan catat pengeluaran kedua saat mengaitkannya kembali.")
+        }
         }
     }
     markId?.let { id ->
@@ -147,11 +151,11 @@ fun ObligationsScreen(vm: MainViewModel, onBack: () -> Unit) {
         var mode by remember(id) { mutableStateOf("Baru") }
         val bill = state.rows.firstOrNull { it.entity.id == id }?.entity
         val candidates = transactions.filter { it.type == "EXPENSE" && it.transferGroup == null && it.amount == bill?.amount }
+        OperationForm(vm, "payBill", onSaved = { markId=null }) {
         FormDialog(title="Catat pembayaran $period", confirmLabel="Konfirmasi",
             confirmEnabled=if(mode == "Baru") accountId != null else txId != null,
             onDismiss={markId=null}, onConfirm={
                 vm.payBill(id, period, if(mode == "Baru") accountId else null, if(mode == "Kaitkan") txId else null)
-                markId=null
             }) {
             Text("${bill?.name.orEmpty()} — ${Money.format(bill?.amount ?: 0L)}")
             DropdownField("Cara pencatatan", listOf("Baru", "Kaitkan"), mode, { it }) { mode=it }
@@ -164,16 +168,18 @@ fun ObligationsScreen(vm: MainViewModel, onBack: () -> Unit) {
                     { "#${it.id} ${it.note} (${java.time.Instant.ofEpochMilli(it.timestamp).atZone(java.time.ZoneId.systemDefault()).toLocalDate()})" }) { txId=it.id }
             }
         }
+        }
     }
-    deleteId?.let { id -> AlertDialog(onDismissRequest={deleteId=null},title={Text("Hapus jadwal tagihan?")},text={Text("Tagihan tidak lagi dicadangkan dalam proyeksi. Riwayat transaksi tetap tersimpan.")},confirmButton={TextButton(onClick={vm.deleteObligation(id);deleteId=null}){Text("Hapus")}},dismissButton={TextButton(onClick={deleteId=null}){Text("Batal")}}) }
+    deleteId?.let { id -> OperationConfirm(vm, "deleteObligation", "Hapus jadwal tagihan?", "Tagihan tidak lagi dicadangkan dalam proyeksi. Riwayat transaksi tetap tersimpan.", { deleteId=null }, { vm.deleteObligation(id) }) }
     if (showAdd) {
+        OperationForm(vm, "addObligation", onSaved = { showAdd=false }) {
         AddObligationDialog(
             onDismiss = { showAdd = false },
             onSave = { name, kind, amount, day, remaining ->
                 vm.addObligation(name, kind, amount, day, remaining)
-                showAdd = false
             }
         )
+        }
     }
 }
 

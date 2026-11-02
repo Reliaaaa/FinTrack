@@ -2,7 +2,7 @@
 
 31 Oktober 2026 • Repository [Reliaaaa/FinTrack](https://github.com/Reliaaaa/FinTrack)
 
-Paket ini melanjutkan aplikasi Kotlin/Compose yang sudah ada. Cakupan saat ini adalah planning dan paket awal repository; tidak ada build APK atau deployment aplikasi baru.
+Paket ini melanjutkan aplikasi Kotlin/Compose yang sudah ada. Paket awal berfokus pada planning; implementasi lanjutan dan hasil validasi dicatat terpisah pada dokumen 10–17. Belum ada deployment produksi.
 
 | Mulai dari | Isi |
 |---|---|
@@ -16,6 +16,6 @@ Paket ini melanjutkan aplikasi Kotlin/Compose yang sudah ada. Cakupan saat ini a
 | [08 — Review akhir](08-review-status.md) | Bukti pemeriksaan, keterbatasan dan status publikasi |
 | [Starter repository](repository-starter/docs/DEVOPS-SETUP.md) | Workflow planning/komentar dan template build/deploy |
 
-[Draft wireframe Canva](https://canva.link/lfdiq977sg6y596) berisi enam halaman. Teks/ID masih perlu perbaikan yang tercatat di peta layar sebelum handoff implementasi.
+[Draft wireframe Canva](https://canva.link/lfdiq977sg6y596) berisi enam halaman. Koreksi teks sudah disimpan; kesesuaian visual aplikasi belum diverifikasi. Lihat [penyelarasan Canva](15-canva-alignment.md), [simpan transaksi](16-transaction-save-feedback.md), dan [seluruh formulir persisten](17-all-form-feedback.md) untuk status terbaru.
 
 Dokumen sumber tetap tidak diubah. Hasil historis repository dibedakan dari pemeriksaan pada sesi ini.
