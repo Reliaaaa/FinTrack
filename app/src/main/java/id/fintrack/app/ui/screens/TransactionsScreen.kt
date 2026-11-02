@@ -21,7 +21,7 @@ import java.time.LocalDate
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,9 +71,9 @@ fun TransactionsScreen(vm: MainViewModel) {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAdd = true }) {
-                Icon(Icons.Filled.Add, contentDescription = "Tambah transaksi")
-            }
+            ExtendedFloatingActionButton(onClick = { showAdd = true },
+                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                text = { Text("Catat") })
         }
     ) { pad ->
         LazyColumn(
@@ -81,7 +81,7 @@ fun TransactionsScreen(vm: MainViewModel) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            item { Text("Transaksi", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold) }
+            item { Text("Riwayat", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold) }
 
             if (drafts.isNotEmpty()) {
                 item { SectionTitle("Menunggu konfirmasi (${drafts.size})") }

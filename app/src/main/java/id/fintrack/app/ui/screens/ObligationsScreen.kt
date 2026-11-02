@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -45,7 +47,7 @@ import id.fintrack.app.vm.MainViewModel
 import java.util.Locale
 
 @Composable
-fun ObligationsScreen(vm: MainViewModel) {
+fun ObligationsScreen(vm: MainViewModel, onBack: () -> Unit) {
     val state by vm.obligations.collectAsStateWithLifecycle()
     val payments by vm.billPayments.collectAsStateWithLifecycle()
     var cancelPayment by remember { mutableStateOf<id.fintrack.app.data.BillPaymentEntity?>(null) }
@@ -54,6 +56,9 @@ fun ObligationsScreen(vm: MainViewModel) {
     var showAdd by remember { mutableStateOf(false) }
 
     Scaffold(
+        topBar = { TopAppBar(title={Text("Tagihan dan cicilan")}, navigationIcon={
+            IconButton(onClick=onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Kembali") }
+        }) },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAdd = true }) {
                 Icon(Icons.Filled.Add, contentDescription = "Tambah kewajiban")
@@ -65,7 +70,6 @@ fun ObligationsScreen(vm: MainViewModel) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            item { Text("Kewajiban", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold) }
             item {
                 FinTrackCard {
                     LabeledValue("Beban per bulan", Money.format(state.monthlyLoad), emphasize = true)

@@ -51,7 +51,7 @@ import java.util.Locale
             Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Color(0xFF2563EB),Color(0xFF163EA6))),RoundedCornerShape(20.dp)).padding(20.dp), verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment=Alignment.CenterVertically) {
                     Text("Total Saldo Tersedia", Modifier.weight(1f), color=Color.White.copy(alpha=.8f))
-                    IconButton(onClick={hidden=!hidden}, Modifier.size(32.dp)) { Icon(if(hidden) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, "Tampilkan atau sembunyikan saldo", tint=Color.White) }
+                    IconButton(onClick={hidden=!hidden}, Modifier.size(48.dp)) { Icon(if(hidden) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, if(hidden) "Tampilkan saldo" else "Sembunyikan saldo", tint=Color.White) }
                 }
                 Text(money(s.liquid), fontSize=30.sp, fontWeight=FontWeight.Bold, color=Color.White)
                 Text(accounts.filter { it.liquid }.joinToString("  •  ") { it.name }.ifEmpty { "Mulai dengan menambahkan rekening" }, color=Color.White.copy(alpha=.8f), fontSize=12.sp)

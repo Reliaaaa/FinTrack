@@ -48,10 +48,10 @@ private data class Tab(val route: String, val label: String, val icon: ImageVect
 
 private val tabs = listOf(
     Tab("home", "Dasbor", Icons.Outlined.Home),
-    Tab("tx", "Transaksi", Icons.Outlined.Receipt),
+    Tab("tx", "Riwayat", Icons.Outlined.Receipt),
     Tab("budget", "Anggaran", Icons.Outlined.PieChart),
     Tab("assets", "Aset", Icons.Outlined.AccountBalanceWallet),
-    Tab("report", "Laporan", Icons.Outlined.BarChart)
+    Tab("more", "Lainnya", Icons.Outlined.MoreHoriz)
 )
 
 private fun NavHostController.goTab(route: String) {
@@ -100,16 +100,19 @@ fun FinTrackApp(vm: MainViewModel = viewModel()) {
             startDestination = "home",
             modifier = Modifier.padding(padding).consumeWindowInsets(padding)
         ) {
-            composable("home") { HomeScreen(vm) { nav.goTab(it) } }
+            composable("home") { HomeScreen(vm) { target ->
+                if (tabs.any { it.route == target }) nav.goTab(target)
+                else nav.navigate(target) { launchSingleTop = true }
+            } }
             composable("import") { ImportScreen(vm) { nav.popBackStack() } }
             composable("budget") { BudgetScreen(vm) }
             composable("forecast") { ForecastScreen(vm) { nav.popBackStack() } }
             composable("goals") { GoalsScreen(vm) { nav.popBackStack() } }
             composable("transfer") { TransferScreen(vm) { nav.popBackStack() } }
             composable("tx") { TransactionsScreen(vm) }
-            composable("obl") { ObligationsScreen(vm) }
+            composable("obl") { ObligationsScreen(vm) { nav.popBackStack() } }
             composable("assets") { AssetsScreen(vm) }
-            composable("more") { MoreScreen { nav.navigate(it) } }
+            composable("more") { MoreScreen { target -> nav.navigate(target) { launchSingleTop = true } } }
             composable("report") { ReportScreen(vm) { nav.popBackStack() } }
             composable("split") { SplitScreen { nav.popBackStack() } }
             composable("zakat") { ZakatScreen(vm) { nav.popBackStack() } }
