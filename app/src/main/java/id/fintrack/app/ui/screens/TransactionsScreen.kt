@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +57,7 @@ import java.time.Instant
 import java.time.ZoneId
 
 @Composable
-fun TransactionsScreen(vm: MainViewModel) {
+fun TransactionsScreen(vm: MainViewModel, openAdd: Boolean = false, onAddOpened: () -> Unit = {}) {
     val txs by vm.transactions.collectAsStateWithLifecycle()
     val drafts by vm.drafts.collectAsStateWithLifecycle()
     val accounts by vm.accounts.collectAsStateWithLifecycle()
@@ -65,7 +66,21 @@ fun TransactionsScreen(vm: MainViewModel) {
     var search by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableStateOf("ALL") }
     val shown = txs.filter { t -> (filter=="ALL" || if(filter=="TRANSFER") t.transferGroup!=null else t.type==filter) && (t.note.contains(search,true) || Category.fromName(t.category).label.contains(search,true)) }
-    var showAdd by remember { mutableStateOf(false) }
+    var showAdd by rememberSaveable { mutableStateOf(false) }
+    val saveState by vm.transactionSave.collectAsStateWithLifecycle()
+    LaunchedEffect(saveState.saved) {
+        if (saveState.saved) {
+            showAdd = false
+            editing = null
+            vm.resetTransactionSave()
+        }
+    }
+    LaunchedEffect(openAdd) {
+        if (openAdd) {
+            showAdd = true
+            onAddOpened()
+        }
+    }
     var confirming by remember { mutableStateOf<TransactionEntity?>(null) }
     val names = remember(accounts) { accounts.associate { it.id to it.name } }
 
@@ -107,7 +122,7 @@ fun TransactionsScreen(vm: MainViewModel) {
             }
             item { SectionTitle("Riwayat") }
             if (shown.isEmpty()) {
-                item { EmptyNote("Belum ada transaksi. Tekan tombol tambah.") }
+                item { EmptyNote("Belum ada transaksi. Tekan tombol Catat.") }
             } else {
                 items(shown, key = { it.id }) { t ->
                     TransactionRow(t, names[t.accountId] ?: "", onDelete = { deleting=t }, onEdit = { editing=t })
@@ -120,13 +135,19 @@ fun TransactionsScreen(vm: MainViewModel) {
         AddTransactionDialog(
             accounts = accounts,
             initial = editing,
-            onDismiss = { showAdd = false; editing=null },
+            saving = saveState.saving,
+            error = saveState.error,
+            onDismiss = {
+                if (!saveState.saving) {
+                    showAdd = false
+                    editing = null
+                    vm.resetTransactionSave()
+                }
+            },
             onSave = { acc, type, amount, category, note, timestamp ->
                 val old=editing
                 if(old==null) vm.addTransaction(acc, type, amount, category, note, timestamp)
                 else vm.editTransaction(old.id,acc,type,amount,category,note,timestamp)
-                editing=null
-                showAdd = false
             }
         )
     }
@@ -173,6 +194,8 @@ private fun AddTransactionDialog(
     accounts: List<AccountEntity>,
     onDismiss: () -> Unit,
     initial: TransactionEntity? = null,
+    saving: Boolean = false,
+    error: String? = null,
     onSave: (Long, TxType, Long, Category, String, Long) -> Unit
 ) {
     var type by remember { mutableStateOf(initial?.type?.let(TxType::valueOf)?:TxType.EXPENSE) }
@@ -187,28 +210,35 @@ private fun AddTransactionDialog(
 
     FormDialog(
         title = if(initial==null) "Catat Transaksi" else "Ubah Transaksi",
-        confirmEnabled = value > 0 && account != null && parsedDate!=null && !parsedDate.isAfter(LocalDate.now()),
+        confirmLabel = if (saving) "Menyimpan..." else "Simpan",
+        dismissEnabled = !saving,
+        confirmEnabled = !saving && value > 0 && account != null && parsedDate!=null && !parsedDate.isAfter(LocalDate.now()),
         onDismiss = onDismiss,
         onConfirm = { account?.let { onSave(it.id, type, value, category, note, requireNotNull(parsedDate).atTime(12,0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()) } }
     ) {
-        if (accounts.isEmpty()) {
-            Text("Tambah rekening dulu di tab Aset.", color = MaterialTheme.colorScheme.error)
+        if (error != null) Text(error, color = MaterialTheme.colorScheme.error)
+        if (saving) {
+            Text("Sedang menyimpan transaksi. Mohon tunggu.")
+        } else {
+            if (accounts.isEmpty()) {
+                Text("Tambah rekening dulu di tab Aset.", color = MaterialTheme.colorScheme.error)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(selected = type == TxType.EXPENSE, onClick = { type = TxType.EXPENSE }, label = { Text("Pengeluaran") })
+                FilterChip(selected = type == TxType.INCOME, onClick = { type = TxType.INCOME }, label = { Text("Pemasukan") })
+            }
+            AmountField("Jumlah", amount) { amount = it }
+            TextInput("Tanggal YYYY-MM-DD",date){date=it}
+            TextInput("Catatan", note) {
+                note = it
+                if (!categoryTouched) category = Categorizer.categorize(it)
+            }
+            DropdownField("Kategori", Category.values().toList(), category, { it.label }) {
+                category = it
+                categoryTouched = true
+            }
+            DropdownField("Rekening", accounts, account, { it.name }) { account = it }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = type == TxType.EXPENSE, onClick = { type = TxType.EXPENSE }, label = { Text("Pengeluaran") })
-            FilterChip(selected = type == TxType.INCOME, onClick = { type = TxType.INCOME }, label = { Text("Pemasukan") })
-        }
-        AmountField("Jumlah", amount) { amount = it }
-        TextInput("Tanggal YYYY-MM-DD",date){date=it}
-        TextInput("Catatan", note) {
-            note = it
-            if (!categoryTouched) category = Categorizer.categorize(it)
-        }
-        DropdownField("Kategori", Category.values().toList(), category, { it.label }) {
-            category = it
-            categoryTouched = true
-        }
-        DropdownField("Rekening", accounts, account, { it.name }) { account = it }
     }
 }
 

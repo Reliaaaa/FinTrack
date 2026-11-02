@@ -64,7 +64,7 @@ import java.util.Locale
         }
         item {
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
-                listOf(Triple("tx","Catat Baru",Icons.Outlined.Add),Triple("budget","Anggaran",Icons.Outlined.PieChart),Triple("assets","Portofolio",Icons.Outlined.AccountBalanceWallet),Triple("forecast","Simulasi",Icons.Outlined.QueryStats)).forEach { (route,label,icon) ->
+                listOf(Triple("tx/add","Catat Baru",Icons.Outlined.Add),Triple("budget","Anggaran",Icons.Outlined.PieChart),Triple("assets","Portofolio",Icons.Outlined.AccountBalanceWallet),Triple("forecast","Simulasi",Icons.Outlined.QueryStats)).forEach { (route,label,icon) ->
                     Column(horizontalAlignment=Alignment.CenterHorizontally) { FilledTonalIconButton(onClick={goTo(route)}){Icon(icon,label)};Text(label,fontSize=11.sp) }
                 }
             }

@@ -101,7 +101,10 @@ fun FinTrackApp(vm: MainViewModel = viewModel()) {
             modifier = Modifier.padding(padding).consumeWindowInsets(padding)
         ) {
             composable("home") { HomeScreen(vm) { target ->
-                if (tabs.any { it.route == target }) nav.goTab(target)
+                if (target == "tx/add") {
+                    nav.goTab("tx")
+                    nav.currentBackStackEntry?.savedStateHandle?.set("openAdd", true)
+                } else if (tabs.any { it.route == target }) nav.goTab(target)
                 else nav.navigate(target) { launchSingleTop = true }
             } }
             composable("import") { ImportScreen(vm) { nav.popBackStack() } }
@@ -109,7 +112,13 @@ fun FinTrackApp(vm: MainViewModel = viewModel()) {
             composable("forecast") { ForecastScreen(vm) { nav.popBackStack() } }
             composable("goals") { GoalsScreen(vm) { nav.popBackStack() } }
             composable("transfer") { TransferScreen(vm) { nav.popBackStack() } }
-            composable("tx") { TransactionsScreen(vm) }
+            composable("tx") { txEntry ->
+                val openAdd by txEntry.savedStateHandle
+                    .getStateFlow("openAdd", false).collectAsStateWithLifecycle()
+                TransactionsScreen(vm, openAdd = openAdd, onAddOpened = {
+                    txEntry.savedStateHandle["openAdd"] = false
+                })
+            }
             composable("obl") { ObligationsScreen(vm) { nav.popBackStack() } }
             composable("assets") { AssetsScreen(vm) }
             composable("more") { MoreScreen { target -> nav.navigate(target) { launchSingleTop = true } } }

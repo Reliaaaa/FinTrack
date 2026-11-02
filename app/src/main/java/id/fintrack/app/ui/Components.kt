@@ -169,14 +169,15 @@ fun FormDialog(
     confirmEnabled: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    dismissEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (dismissEnabled) onDismiss() },
         title = { Text(title) },
         text = { Column(Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp), content = content) },
         confirmButton = { TextButton(onClick = onConfirm, enabled = confirmEnabled) { Text(confirmLabel) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal") } }
+        dismissButton = { TextButton(onClick = onDismiss, enabled = dismissEnabled) { Text("Batal") } }
     )
 }
 

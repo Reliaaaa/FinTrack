@@ -41,6 +41,12 @@ import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
 
+data class TransactionSaveState(
+    val saving: Boolean = false,
+    val saved: Boolean = false,
+    val error: String? = null
+)
+
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val fintrack = app as FinTrackApplication
     private val repo = fintrack.repository
@@ -185,11 +191,36 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     // Transaksi
-    fun addTransaction(accountId: Long, type: TxType, amount: Long, category: Category, note: String, timestamp: Long = System.currentTimeMillis()) {
-        mutate { repo.addTransaction(accountId, type, amount, category, note, timestamp) }
+    private val transactionSaveFlow = MutableStateFlow(TransactionSaveState())
+    val transactionSave: StateFlow<TransactionSaveState> = transactionSaveFlow
+
+    fun resetTransactionSave() {
+        if (!transactionSaveFlow.value.saving) transactionSaveFlow.value = TransactionSaveState()
     }
 
-    fun editTransaction(id: Long, accountId: Long, type: TxType, amount: Long, category: Category, note: String, timestamp: Long) = mutate {
+    private fun saveTransaction(block: suspend () -> Unit) {
+        // Set synchronously so repeated taps cannot enqueue another write.
+        if (transactionSaveFlow.value.saving || transactionSaveFlow.value.saved) return
+        transactionSaveFlow.value = TransactionSaveState(saving = true)
+        viewModelScope.launch {
+            try {
+                block()
+                transactionSaveFlow.value = TransactionSaveState(saved = true)
+                messageFlow.value = "Tersimpan"
+            } catch (e: CancellationException) {
+                transactionSaveFlow.value = TransactionSaveState()
+                throw e
+            } catch (e: Exception) {
+                transactionSaveFlow.value = TransactionSaveState(error = e.message ?: "Gagal menyimpan. Coba lagi.")
+            }
+        }
+    }
+
+    fun addTransaction(accountId: Long, type: TxType, amount: Long, category: Category, note: String, timestamp: Long = System.currentTimeMillis()) {
+        saveTransaction { repo.addTransaction(accountId, type, amount, category, note, timestamp) }
+    }
+
+    fun editTransaction(id: Long, accountId: Long, type: TxType, amount: Long, category: Category, note: String, timestamp: Long) = saveTransaction {
         repo.editTransaction(id,accountId,type,amount,category,note,timestamp)
     }
 
