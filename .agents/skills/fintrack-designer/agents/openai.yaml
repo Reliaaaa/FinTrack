@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack Designer"
+  short_description: "Rancang alur layar dan handoff UI FinTrack"
+  default_prompt: "Gunakan $fintrack-designer untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."

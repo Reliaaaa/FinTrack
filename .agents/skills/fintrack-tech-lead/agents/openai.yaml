@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack Tech Lead"
+  short_description: "Review lintas agent dan putuskan gate FinTrack"
+  default_prompt: "Gunakan $fintrack-tech-lead untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."

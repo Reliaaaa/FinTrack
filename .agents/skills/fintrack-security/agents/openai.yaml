@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack Security Developer"
+  short_description: "Review keamanan dan alur data FinTrack"
+  default_prompt: "Gunakan $fintrack-security untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."

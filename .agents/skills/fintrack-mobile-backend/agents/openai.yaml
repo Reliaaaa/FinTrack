@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack Mobile & Backend"
+  short_description: "Implementasikan Android dan API FinTrack"
+  default_prompt: "Gunakan $fintrack-mobile-backend untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."

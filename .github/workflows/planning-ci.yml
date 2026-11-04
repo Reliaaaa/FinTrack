@@ -1,0 +1,28 @@
+name: Planning validation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2; review pin before activation
+        with:
+          persist-credentials: false
+      - name: Check planning package only
+        shell: bash
+        run: |
+          test -s AGENTS.md
+          test -s docs/planning/01-master-plan.md
+          test -s docs/planning/02-backlog.md
+          test -s docs/planning/repository-starter/docs/SECURITY.proposed.md
+          test -s docs/planning/repository-starter/docs/DEVOPS-SETUP.md
+          test -s .github/workflows/run-comments.yml
+          test "$(find .agents/skills -name SKILL.md | wc -l)" -ge 9
+          git diff --check
+          printf '%s\n' 'Planning files checked. This is NOT an Android build or deployment.' >> "$GITHUB_STEP_SUMMARY"

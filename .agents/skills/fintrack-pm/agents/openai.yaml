@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack Project Manager"
+  short_description: "Pecah ide FinTrack menjadi backlog siap kerja"
+  default_prompt: "Gunakan $fintrack-pm untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."

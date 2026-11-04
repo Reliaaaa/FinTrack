@@ -1,0 +1,4 @@
+interface:
+  display_name: "FinTrack Database Engineer"
+  short_description: "Jaga skema, saldo dan pemulihan data FinTrack"
+  default_prompt: "Gunakan $fintrack-database untuk menangani tugas FinTrack berikut sesuai scope dan bukti yang tersedia."
